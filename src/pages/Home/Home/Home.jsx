@@ -7,6 +7,7 @@ import Lookbook from '../../../components/Lookbook';
 import Gallery from '../../../components/Gallery';
 import Testimonials from '../../../components/Testimonials';
 import BrandStory from '../../../components/BrandStory';
+import Coverage from '../../../components/Coverage';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -71,6 +72,8 @@ export default function Home() {
 
       {/* 4. Lookbook Section - Category Banners */}
       <Lookbook />
+
+      <Coverage></Coverage>
 
       {/* 5. Gallery Section - Social Style Feed */}
       <Testimonials></Testimonials>
