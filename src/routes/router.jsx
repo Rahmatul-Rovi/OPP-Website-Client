@@ -8,6 +8,7 @@ import AllCollections from '../pages/AllCollections';
 import AddProduct from '../pages/Admin/AddProduct';
 import AdminLayout from '../layouts/AdminLayout';
 import AdminPos from '../pages/Admin/AdminPos';
+import MakeAdmin from '../pages/Admin/MakeAdmin';
 
 
 const router = createBrowserRouter([
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
     {
   path: "pos",
   element: <AdminPos />
+},
+{
+  path: 'make-admin',
+  Component: MakeAdmin
 }
     // Pore Inventory ba Dashboard page eikhane ashbe
   ]
