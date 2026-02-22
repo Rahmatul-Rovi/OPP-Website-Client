@@ -58,7 +58,7 @@ const Navbar = () => {
         <ul className="flex justify-center space-x-8 text-[13px] font-bold uppercase tracking-widest text-gray-800">
           <li><NavLink to="/" className={({isActive}) => isActive ? "text-black border-b border-black" : "hover:text-gray-500"}>Home</NavLink></li>
           <li><NavLink to="/all-collection" className={({isActive}) => isActive ? "text-black border-b border-black" : "hover:text-gray-500"}>All Collection</NavLink></li>
-          <li><NavLink to="/testimonials" className={({isActive}) => isActive ? "text-black border-b border-black" : "hover:text-gray-500"}>Testimonials</NavLink></li>
+          <li><NavLink to="/about" className={({isActive}) => isActive ? "text-black border-b border-black" : "hover:text-gray-500"}>About Us</NavLink></li>
           <li><NavLink to="/coverage" className={({isActive}) => isActive ? "text-black border-b border-black" : "hover:text-gray-500"}>Coverage</NavLink></li>
         </ul>
       </div>
