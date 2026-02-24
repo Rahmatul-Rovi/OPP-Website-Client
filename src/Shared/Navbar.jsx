@@ -13,7 +13,7 @@ const Navbar = () => {
     <nav className="w-full bg-white sticky top-0 z-50 border-b border-gray-100">
       {/* Top Thin Bar (Optional, for announcements) */}
       <div className="bg-black text-white text-[10px] py-1.5 text-center uppercase tracking-widest">
-        Free shipping on orders over 5000 BDT
+        Welcome to our Shop
       </div>
 
       <div className="container mx-auto px-6 lg:px-12 py-5 flex justify-between items-center">
