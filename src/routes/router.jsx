@@ -11,6 +11,7 @@ import AdminPos from '../pages/Admin/AdminPos';
 import MakeAdmin from '../pages/Admin/MakeAdmin';
 import Inventory from '../pages/Admin/Inventory';
 import ProductDetails from '../pages/ProductDetails';
+import AdminDashboard from '../pages/Admin/AdminDashboard';
 
 
 const router = createBrowserRouter([
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
   path: "manage-products",
   Component: Inventory
 },
+{
+  path: "/admin",
+  Component: AdminDashboard
+}
   ]
 }
 ]);
