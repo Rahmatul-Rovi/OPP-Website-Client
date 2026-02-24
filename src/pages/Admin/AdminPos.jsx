@@ -47,9 +47,23 @@ const AdminPos = () => {
     documentTitle: `Receipt_${invoiceNumber}`,
   });
 
-  const filteredProducts = products.filter(p =>
-    p.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ const filteredProducts = products.filter(p => {
+    // Search term-ke alada kora
+    const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term !== "");
+
+    // Jodi search box khali thake, shob product dekhaw
+    if (searchTerms.length === 0) return true;
+
+    return searchTerms.every(term => {
+        const titleMatch = p.title?.toLowerCase().includes(term);
+        
+        // 🟢 Safe check: price thaklei toString hobe, naile khali string hobe
+        const priceString = (p.price !== null && p.price !== undefined) ? p.price.toString() : "";
+        const priceMatch = priceString.includes(term);
+
+        return titleMatch || priceMatch;
+    });
+});
 
   const addToCart = (product) => {
     if (product.stock <= 0) {

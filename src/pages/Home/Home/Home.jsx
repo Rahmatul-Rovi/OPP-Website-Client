@@ -1,33 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; // 🟢 Link import kora must
 import Hero from '../../../components/Hero';
 import ProductCard from '../../../components/ProductCard';
 import Features from '../../../components/Features';
 import Lookbook from '../../../components/Lookbook';
-import Gallery from '../../../components/Gallery';
-import Testimonials from '../../../components/Testimonials';
-import BrandStory from '../../../components/BrandStory';
 import Coverage from '../../../components/Coverage';
 import About from '../../../components/About';
-import AllCollections from '../../AllCollections';
-import AOS from 'aos'; // 🟢 1. Import AOS
-import 'aos/dist/aos.css'; // 🟢 2. Import CSS
+import Testimonials from '../../../components/Testimonials';
+import BrandStory from '../../../components/BrandStory';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🟢 3. AOS Initialize
-    AOS.init({
-      duration: 1000, // Animation speed (1 second)
-      once: false,    // Scroll up-down korle bar bar hobe (true dile shudhu 1 bar)
-      mirror: true,
-    });
+    AOS.init({ duration: 1000, once: false, mirror: true });
 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/products'); // API path check koro
+        const res = await axios.get('http://localhost:5000/products');
         setProducts(res.data);
       } catch (err) {
         console.error("Backend connection fail:", err);
@@ -39,19 +33,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white overflow-x-hidden"> {/* Horizontal scroll avoid korte */}
-      
-      {/* 1. Hero - Fade Down */}
-      <div data-aos="fade-down">
-        <Hero />
-      </div>
+    <div className="bg-white overflow-x-hidden">
+      <div data-aos="fade-down"><Hero /></div>
+      <div data-aos="fade-up" data-aos-delay="200"><Features /></div>
 
-      {/* 2. Features - Fade Up */}
-      <div data-aos="fade-up" data-aos-delay="200">
-        <Features />
-      </div>
-
-      {/* 3. Product Section */}
+      {/* 🟢 3. Product Section - Optimized for 8 items */}
       <section className="container mx-auto px-6 py-20">
         <div className="flex flex-col items-center mb-12" data-aos="zoom-in">
           <h2 className="text-3xl font-black uppercase tracking-tighter text-black">
@@ -65,41 +51,43 @@ export default function Home() {
             <p className="text-xs font-bold uppercase tracking-[4px] animate-pulse">Loading Trends...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
-            {products.map((item, index) => (
-              <div 
-                key={item._id} 
-                data-aos="fade-up" 
-                data-aos-delay={index * 100} // Ekta ekta kore smooth ashar jonne
-              >
-                <ProductCard product={item} />
+          <>
+            {/* .slice(0, 8) use kora hoyeche jate shudhu 8 ta product show hoy */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+              {products.slice(0, 8).map((item, index) => (
+                <div 
+                  key={item._id} 
+                  data-aos="fade-up" 
+                  data-aos-delay={index * 100}
+                >
+                  <ProductCard product={item} />
+                </div>
+              ))}
+            </div>
+
+            {/* 🟢 "View All" Button Section */}
+            {products.length > 8 && (
+              <div className="mt-16 flex justify-center" data-aos="fade-up">
+                <Link 
+                  to="/all-collection" 
+                  className="group relative px-12 py-4 bg-black text-white text-[10px] font-black uppercase tracking-[0.4em] transition-all hover:bg-zinc-800 active:scale-95"
+                >
+                  <span className="relative z-10 flex items-center gap-3">
+                    View All Collections
+                    <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
+                  </span>
+                </Link>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </section>
 
-      {/* 4. Lookbook - Slide Left/Right */}
-      <div data-aos="fade-right">
-        <Lookbook />
-      </div>
-
-      <div data-aos="fade-left">
-        <Coverage />
-      </div>
-
-      {/* Baki section gulo */}
-      <div data-aos="zoom-in-up">
-        <Testimonials />
-      </div>
-      
-      <div data-aos="fade-up">
-        <About />
-      </div>
-
-      <div data-aos="flip-up">
-        <BrandStory />
-      </div>
+      <div data-aos="fade-right"><Lookbook /></div>
+      <div data-aos="fade-left"><Coverage /></div>
+      <div data-aos="zoom-in-up"><Testimonials /></div>
+      <div data-aos="fade-up"><About /></div>
+      <div data-aos="flip-up"><BrandStory /></div>
     </div>
   );
 }

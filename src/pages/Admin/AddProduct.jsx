@@ -114,6 +114,7 @@ const AddProduct = () => {
           <input
             type="text"
             name="title"
+            placeholder='Product Name'
             required
             value={formData.title}
             onChange={handleChange}
@@ -129,6 +130,7 @@ const AddProduct = () => {
           <input
             type="number"
             name="price"
+            placeholder='Product Price'
             required
             value={formData.price}
             onChange={handleChange}
@@ -144,6 +146,7 @@ const AddProduct = () => {
           <input
             type="number"
             name="stock"
+            placeholder='product Quantity'
             required
             value={formData.stock}
             onChange={handleChange}
