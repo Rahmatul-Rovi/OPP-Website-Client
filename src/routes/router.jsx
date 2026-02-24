@@ -9,6 +9,7 @@ import AddProduct from '../pages/Admin/AddProduct';
 import AdminLayout from '../layouts/AdminLayout';
 import AdminPos from '../pages/Admin/AdminPos';
 import MakeAdmin from '../pages/Admin/MakeAdmin';
+import Inventory from '../pages/Admin/Inventory';
 
 
 const router = createBrowserRouter([
@@ -49,8 +50,11 @@ const router = createBrowserRouter([
 {
   path: 'make-admin',
   Component: MakeAdmin
-}
-    // Pore Inventory ba Dashboard page eikhane ashbe
+},
+{
+  path: "manage-products",
+  Component: Inventory
+},
   ]
 }
 ]);
