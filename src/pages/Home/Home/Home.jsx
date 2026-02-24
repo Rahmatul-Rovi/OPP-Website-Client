@@ -8,16 +8,26 @@ import Gallery from '../../../components/Gallery';
 import Testimonials from '../../../components/Testimonials';
 import BrandStory from '../../../components/BrandStory';
 import Coverage from '../../../components/Coverage';
+import About from '../../../components/About';
+import AllCollections from '../../AllCollections';
+import AOS from 'aos'; // 🟢 1. Import AOS
+import 'aos/dist/aos.css'; // 🟢 2. Import CSS
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Real-time backend theke data fetch
+    // 🟢 3. AOS Initialize
+    AOS.init({
+      duration: 1000, // Animation speed (1 second)
+      once: false,    // Scroll up-down korle bar bar hobe (true dile shudhu 1 bar)
+      mirror: true,
+    });
+
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/products');
+        const res = await axios.get('http://localhost:5000/products'); // API path check koro
         setProducts(res.data);
       } catch (err) {
         console.error("Backend connection fail:", err);
@@ -25,21 +35,25 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
   return (
-    <div className="bg-white">
-      {/* 1. Hero Section - Main Banner */}
-      <Hero />
+    <div className="bg-white overflow-x-hidden"> {/* Horizontal scroll avoid korte */}
+      
+      {/* 1. Hero - Fade Down */}
+      <div data-aos="fade-down">
+        <Hero />
+      </div>
 
-      {/* 2. Features Section - Trust badges (Quality, Showroom, etc.) */}
-      <Features />
+      {/* 2. Features - Fade Up */}
+      <div data-aos="fade-up" data-aos-delay="200">
+        <Features />
+      </div>
 
-      {/* 3. Product Section - Collection Grid */}
+      {/* 3. Product Section */}
       <section className="container mx-auto px-6 py-20">
-        <div className="flex flex-col items-center mb-12">
+        <div className="flex flex-col items-center mb-12" data-aos="zoom-in">
           <h2 className="text-3xl font-black uppercase tracking-tighter text-black">
             Featured Collection
           </h2>
@@ -52,34 +66,40 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
-            {products.length > 0 ? (
-              products.map((item) => (
-                <ProductCard key={item._id} product={item} />
-              ))
-            ) : (
-              <p className="col-span-full text-center text-gray-400">No products available in the shop.</p>
-            )}
+            {products.map((item, index) => (
+              <div 
+                key={item._id} 
+                data-aos="fade-up" 
+                data-aos-delay={index * 100} // Ekta ekta kore smooth ashar jonne
+              >
+                <ProductCard product={item} />
+              </div>
+            ))}
           </div>
         )}
-
-        {/* View All Button */}
-        <div className="flex justify-center mt-16">
-          <button className="px-10 py-3 border border-black text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-300">
-            View All Collection
-          </button>
-        </div>
       </section>
 
-      {/* 4. Lookbook Section - Category Banners */}
-      <Lookbook />
+      {/* 4. Lookbook - Slide Left/Right */}
+      <div data-aos="fade-right">
+        <Lookbook />
+      </div>
 
-      <Coverage></Coverage>
+      <div data-aos="fade-left">
+        <Coverage />
+      </div>
 
-      {/* 5. Gallery Section - Social Style Feed */}
-      <Testimonials></Testimonials>
+      {/* Baki section gulo */}
+      <div data-aos="zoom-in-up">
+        <Testimonials />
+      </div>
+      
+      <div data-aos="fade-up">
+        <About />
+      </div>
 
-      {/* BrandStory Section */}
-      <BrandStory></BrandStory>
+      <div data-aos="flip-up">
+        <BrandStory />
+      </div>
     </div>
   );
 }

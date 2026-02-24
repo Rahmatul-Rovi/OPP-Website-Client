@@ -1,30 +1,62 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function ProductCard({ product }) {
-  // Jodi data na thake, error prevent korar jonno loader ba null
   if (!product) return null;
 
+  // Discount logic (optional, kintu thaka bhalo)
+  const hasDiscount = Number(product.discount) > 0;
+  const discountedPrice = hasDiscount 
+    ? Math.round(product.price - (product.price * product.discount / 100)) 
+    : product.price;
+
   return (
-    <div className="group cursor-pointer">
-      <div className="relative overflow-hidden aspect-[3/4] bg-gray-50 border border-gray-100">
+    <div className="group flex flex-col">
+      {/* 1. Image Wrapper */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 border border-gray-100">
         <img 
           src={product.image} 
           alt={product.title} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
         />
-        {/* Hover-e store info show korbe */}
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-          <p className="bg-white text-[10px] font-bold px-4 py-2 uppercase tracking-widest shadow-md">
-            Available In Store
-          </p>
+        
+        {/* 🟢 View Details Overlay - Link ta thik kora hoyeche */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+          <Link 
+            to={`/product/${product._id}`} 
+            className="bg-white text-black px-6 py-3 text-[10px] font-black uppercase tracking-widest translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-2xl"
+          >
+            View Details
+          </Link>
         </div>
+
+        {/* Discount Badge */}
+        {hasDiscount && (
+          <div className="absolute top-4 left-4 bg-black text-white px-2 py-1 text-[8px] font-black uppercase tracking-[2px]">
+            -{product.discount}%
+          </div>
+        )}
       </div>
       
-      <div className="mt-4 text-center">
-        <h3 className="text-sm font-bold uppercase tracking-tight text-gray-800">
-          {product.title}
-        </h3>
-        <p className="text-gray-500 text-sm mt-1">BDT {product.price}</p>
+      {/* 2. Product Info */}
+      <div className="mt-5 space-y-1">
+        <div className="flex justify-between items-start">
+          <h3 className="text-[11px] font-black uppercase tracking-tighter text-black flex-grow">
+            {product.title}
+          </h3>
+          <p className="text-[11px] font-black italic ml-2">
+            ৳{discountedPrice}
+          </p>
+        </div>
+        
+        <div className="flex justify-between items-center">
+           <p className="text-gray-400 text-[9px] uppercase font-bold tracking-widest">
+            {product.category}
+          </p>
+          {hasDiscount && (
+            <span className="text-[9px] text-gray-300 line-through font-bold">৳{product.price}</span>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import AdminLayout from '../layouts/AdminLayout';
 import AdminPos from '../pages/Admin/AdminPos';
 import MakeAdmin from '../pages/Admin/MakeAdmin';
 import Inventory from '../pages/Admin/Inventory';
+import ProductDetails from '../pages/ProductDetails';
 
 
 const router = createBrowserRouter([
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: 'all-collection',
         Component: AllCollections
+      },
+      {
+        path: "product/:id",
+        Component: ProductDetails
       }
     ]
   },
