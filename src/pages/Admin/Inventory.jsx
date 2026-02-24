@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { HiOutlineTrash, HiOutlineEye, HiOutlinePlus, HiOutlineMinus } from 'react-icons/hi';
+import { HiOutlineTrash, HiOutlineEye, HiOutlinePlus, HiOutlineMinus, HiSearch, HiFilter } from 'react-icons/hi';
 import Swal from 'sweetalert2';
 
 const Inventory = () => {
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [discount, setDiscount] = useState(0);
-  const [newPrice, setNewPrice] = useState(0); // Price edit korar jonno state
+  const [newPrice, setNewPrice] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const fetchProducts = async () => {
@@ -24,21 +26,30 @@ const Inventory = () => {
     fetchProducts();
   }, []);
 
+  // Filter Logic
+  const filteredProducts = products.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = ['All', ...new Set(products.map(p => p.category || 'General'))];
+
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      text: "Product delete korle ar phire paba na!",
+      title: 'Delete Product?',
+      text: "You won't be able to revert this!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#000',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: 'Confirm'
     });
 
     if (confirm.isConfirmed) {
       try {
         await axios.delete(`http://localhost:5000/products/${id}`);
-        Swal.fire('Deleted!', 'Product removed successfully.', 'success');
+        Swal.fire('Deleted!', 'Successfully removed.', 'success');
         fetchProducts();
       } catch (error) {
         Swal.fire('Error', 'Delete failed!', 'error');
@@ -60,16 +71,13 @@ const Inventory = () => {
   const handleApplyChanges = async () => {
     if (!selectedProduct) return;
     setLoading(true);
-
     try {
-      // Backend e data pathano
       await axios.patch(`http://localhost:5000/products/${selectedProduct._id}`, {
         stock: Number(selectedProduct.stock),
-        price: Number(newPrice), // Edit kora price
+        price: Number(newPrice),
         discount: Number(discount)
       });
-
-      Swal.fire('Updated!', 'Product updated successfully.', 'success');
+      Swal.fire('Updated!', 'Changes applied successfully.', 'success');
       setSelectedProduct(null);
       fetchProducts();
     } catch (error) {
@@ -80,65 +88,116 @@ const Inventory = () => {
   };
 
   return (
-    <div className="p-8 bg-white min-h-screen">
-      <div className="flex justify-between items-end mb-10 border-b pb-4">
+    <div className="p-8 bg-white min-h-screen text-black font-sans">
+      {/* --- HEADER SECTION --- */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
-          <h2 className="text-3xl font-black uppercase tracking-tighter italic text-black">Inventory Control</h2>
-          <p className="text-[10px] text-gray-400 uppercase tracking-[3px]">Manage stock and pricing</p>
+          <h2 className="text-4xl font-black uppercase tracking-tighter italic">Inventory Console</h2>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="h-1 w-10 bg-black"></span>
+            <p className="text-[10px] text-gray-500 uppercase tracking-[4px]">System Operations & Logistics</p>
+          </div>
         </div>
-        <p className="text-xs font-bold uppercase">Total Items: {products.length}</p>
+
+        {/* Stats Cards */}
+        <div className="flex gap-4">
+          <div className="bg-white border-2 border-black p-4 min-w-[120px]">
+            <p className="text-[9px] font-black uppercase text-gray-400">Total Stock</p>
+            <p className="text-2xl font-black">{products.reduce((acc, curr) => acc + (curr.stock || 0), 0)}</p>
+          </div>
+          <div className="bg-black text-white p-4 min-w-[120px]">
+            <p className="text-[9px] font-black uppercase text-gray-500">Low Stock</p>
+            <p className="text-2xl font-black">{products.filter(p => p.stock < 5).length}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* --- CONTROL BAR --- */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input 
+            type="text" 
+            placeholder="Search product name..." 
+            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 outline-none focus:border-black transition"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="relative">
+          <HiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <select 
+            className="pl-12 pr-10 py-3 bg-white border border-gray-200 outline-none appearance-none focus:border-black cursor-pointer uppercase text-xs font-bold"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* --- TABLE --- */}
+      <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-500 border-b">
-              <th className="p-4 text-black">Product</th>
-              <th className="p-4 text-black">Price (BDT)</th>
-              <th className="p-4 text-black">Stock Status</th>
-              <th className="p-4 text-right text-black">Actions</th>
+            <tr className="bg-black text-[10px] font-black uppercase tracking-[2px] text-white">
+              <th className="p-5">Product Info</th>
+              <th className="p-5">Category</th>
+              <th className="p-5">Financials (BDT)</th>
+              <th className="p-5">Inventory</th>
+              <th className="p-5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {products.map((item) => {
+          <tbody className="divide-y divide-gray-100">
+            {filteredProducts.map((item) => {
               const mainPrice = Number(item.price || 0);
               const disc = Number(item.discount || 0);
               const discountedPrice = mainPrice - (mainPrice * disc / 100);
 
               return (
-                <tr key={item._id} className="border-b hover:bg-gray-50 transition">
-                  <td className="p-4 flex items-center gap-3">
-                    <img src={item.image} alt="" className="w-12 h-12 object-cover border" />
-                    <span className="text-sm font-bold uppercase truncate max-w-[200px]">{item.title}</span>
+                <tr key={item._id} className="hover:bg-gray-50/50 transition-colors group">
+                  <td className="p-5 flex items-center gap-4">
+                    <div className="relative overflow-hidden border p-1 bg-white">
+                       <img src={item.image} alt="" className="w-14 h-14 object-cover transition-all duration-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-black uppercase leading-none">{item.title}</p>
+                      <p className="text-[9px] text-gray-400 mt-1">ID: {item._id.slice(-6).toUpperCase()}</p>
+                    </div>
                   </td>
-                  <td className="p-4">
+                  <td className="p-5">
+                    <span className="text-[10px] font-bold border px-2 py-1 uppercase">{item.category || 'General'}</span>
+                  </td>
+                  <td className="p-5">
                     {disc > 0 ? (
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-400 line-through">৳{mainPrice.toLocaleString()}</span>
-                        <span className="text-sm font-black text-red-600">৳{discountedPrice.toLocaleString()}</span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-[10px] text-gray-400 line-through decoration-black/30">৳{mainPrice.toLocaleString()}</span>
+                        <span className="text-sm font-black text-red-600 italic">৳{discountedPrice.toLocaleString()}</span>
                       </div>
                     ) : (
                       <span className="text-sm font-black text-black">৳{mainPrice.toLocaleString()}</span>
                     )}
                   </td>
-                  <td className="p-4">
-                    <span className={`px-3 py-1 text-[10px] font-bold rounded-full ${item.stock > 5 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                      {item.stock} in stock
-                    </span>
+                  <td className="p-5">
+                    <div className="flex items-center gap-2">
+                        <div className={`h-2 w-2 rounded-full ${item.stock > 5 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <span className="text-[11px] font-black uppercase">{item.stock} Units</span>
+                    </div>
                   </td>
-                  <td className="p-4 text-right space-x-2">
+                  <td className="p-5 text-right space-x-2">
                     <button 
                       onClick={() => {
                         setSelectedProduct(item);
                         setNewPrice(item.price);
                         setDiscount(item.discount || 0);
                       }} 
-                      className="p-2 hover:bg-black hover:text-white border border-black transition rounded-sm"
+                    className="p-2.5 bg-white border border-black text-black hover:bg-black hover:text-white transition-all duration-300 hover:shadow-md"
                     >
-                      <HiOutlineEye />
+                      <HiOutlineEye size={18}/>
                     </button>
-                    <button onClick={() => handleDelete(item._id)} className="p-2 hover:bg-red-600 hover:text-white border border-black transition rounded-sm">
-                      <HiOutlineTrash />
+                    <button 
+                      onClick={() => handleDelete(item._id)} 
+                      className="p-2.5 bg-white border border-gray-200 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all"
+                    >
+                      <HiOutlineTrash size={18}/>
                     </button>
                   </td>
                 </tr>
@@ -148,57 +207,64 @@ const Inventory = () => {
         </table>
       </div>
 
-      {/* MODAL */}
+      {/* --- MODAL --- */}
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white max-w-lg w-full p-8 relative shadow-2xl animate-in fade-in zoom-in duration-300">
-            <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 font-bold text-xl">✕</button>
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 backdrop-blur-[2px]">
+          <div className="bg-white max-w-xl w-full p-10 relative shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] border-t-8 border-black">
+            <button onClick={() => setSelectedProduct(null)} className="absolute top-6 right-6 font-light text-3xl hover:rotate-90 transition-transform">✕</button>
 
-            <div className="flex gap-6 mb-8 border-b pb-6">
-              <img src={selectedProduct.image} className="w-32 h-40 object-cover border-2 border-black p-1" alt="" />
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tighter">{selectedProduct.title}</h3>
-                <p className="text-2xl mt-2 font-bold">৳{newPrice.toLocaleString()}</p>
-                {discount > 0 && <p className="text-xs text-red-600 font-bold">-{discount}% OFF</p>}
+            <div className="flex gap-8 mb-10 border-b pb-8">
+              <img src={selectedProduct.image} className="w-40 h-48 object-cover border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" alt="" />
+              <div className="flex flex-col justify-center">
+                <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 w-fit mb-2 uppercase tracking-widest">{selectedProduct.category}</span>
+                <h3 className="text-2xl font-black uppercase tracking-tight mb-2 leading-none">{selectedProduct.title}</h3>
+                <div className="mt-4">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase">Current Market Price</p>
+                    <p className="text-3xl font-black">৳{newPrice.toLocaleString()}</p>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              {/* PRICE EDIT */}
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Edit Price</label>
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div className="group">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2 group-focus-within:text-black">Modify Price</label>
                 <input 
                   type="number" 
                   value={newPrice}
                   onChange={(e) => setNewPrice(Number(e.target.value))}
-                  className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-black font-bold"
+                  className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-black font-black text-xl transition-colors"
                 />
               </div>
 
-              {/* DISCOUNT EDIT */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Discount (%)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Offer Discount (%)</label>
                 <input 
                   type="number" 
                   value={discount}
                   onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
-                  className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-black font-bold"
+                  className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-black font-black text-xl transition-colors"
                 />
               </div>
             </div>
 
-            {/* STOCK CONTROL */}
-            <div className="mb-8">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-3">Update Stock</label>
-              <div className="flex items-center gap-6">
-                <button onClick={() => handleUpdateStock(selectedProduct._id, selectedProduct.stock - 1)} className="p-3 border border-black hover:bg-black hover:text-white transition"><HiOutlineMinus /></button>
-                <span className="text-xl font-black w-10 text-center">{selectedProduct.stock}</span>
-                <button onClick={() => handleUpdateStock(selectedProduct._id, selectedProduct.stock + 1)} className="p-3 border border-black hover:bg-black hover:text-white transition"><HiOutlinePlus /></button>
+            <div className="mb-10 bg-gray-50 p-6 border border-dashed border-gray-300">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-4">Stock Inventory Adjustment</label>
+              <div className="flex items-center gap-8">
+                <button onClick={() => handleUpdateStock(selectedProduct._id, selectedProduct.stock - 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlineMinus /></button>
+                <div className="flex flex-col items-center">
+                    <span className="text-3xl font-black">{selectedProduct.stock}</span>
+                    <span className="text-[8px] font-black uppercase text-gray-400">In Warehouse</span>
+                </div>
+                <button onClick={() => handleUpdateStock(selectedProduct._id, selectedProduct.stock + 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlinePlus /></button>
               </div>
             </div>
 
-            <button onClick={handleApplyChanges} disabled={loading} className="w-full bg-black text-white py-4 uppercase font-black tracking-widest hover:bg-gray-800 transition disabled:bg-gray-400 shadow-lg">
-              {loading ? 'Updating...' : 'Save All Changes'}
+            <button 
+              onClick={handleApplyChanges} 
+              disabled={loading} 
+              className="w-full bg-black text-white py-5 uppercase font-black tracking-[4px] hover:bg-gray-900 transition-all disabled:bg-gray-400 active:scale-[0.98]"
+            >
+              {loading ? 'Processing...' : 'Synchronize Changes'}
             </button>
           </div>
         </div>
