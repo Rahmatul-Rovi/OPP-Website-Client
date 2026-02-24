@@ -208,12 +208,12 @@ const AdminPos = () => {
 
           <div className="p-4 space-y-2 border-b">
             <input 
-              type="text" placeholder="Customer Name" 
+              type="text" required placeholder="Customer Name" 
               className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
               value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})}
             />
             <input 
-              type="text" placeholder="Phone Number" 
+              type="text" required placeholder="Phone Number" 
               className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
               value={customer.phone} onChange={(e) => setCustomer({...customer, phone: e.target.value})}
             />
