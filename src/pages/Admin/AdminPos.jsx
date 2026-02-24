@@ -1,41 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; 
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import axios from 'axios';
 import { HiSearch, HiOutlineTrash, HiPlus, HiMinus, HiOutlineShoppingCart } from 'react-icons/hi';
+import { Printer } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { useReactToPrint } from 'react-to-print';
 
 const AdminPos = () => {
-  const [products, setProducts] = useState([]); 
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false); // ✅ Fix: Eita missing silo
+  const [loading, setLoading] = useState(false);
+  const [customer, setCustomer] = useState({ name: "", phone: "" });
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  
+  const componentRef = useRef(null);
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  // ================= FETCH PRODUCTS =================
+  const generateInvoiceNumber = () => `INV${Date.now().toString().slice(-6)}`;
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/products');
-        setProducts(res.data);
-      } catch (err) {
-        console.error("POS Data Load Error", err);
-      }
-    };
+    setInvoiceNumber(generateInvoiceNumber());
     fetchProducts();
   }, []);
 
-  // ================= SEARCH FILTER LOGIC =================
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/products');
+      setProducts(res.data);
+    } catch (err) {
+      console.error("POS Data Load Error", err);
+    }
+  };
+
+  // 🟢 Helper: Discounted Price Calculate Korar Jonne
+  const getEffectivePrice = (product) => {
+    const mainPrice = Number(product.price || 0);
+    const discPercent = Number(product.discount || 0);
+    if (discPercent > 0) {
+      return mainPrice - (mainPrice * discPercent / 100);
+    }
+    return mainPrice;
+  };
+
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: `Receipt_${invoiceNumber}`,
+  });
+
   const filteredProducts = products.filter(p =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ================= CART LOGIC =================
   const addToCart = (product) => {
+    if (product.stock <= 0) {
+      return Swal.fire("Out of Stock", "Product stock-e nai!", "warning");
+    }
+
+    // Discounted price calculate kore cart-e pathacci
+    const priceToCharge = getEffectivePrice(product);
+
     const existingItem = cart.find(item => item._id === product._id);
     if (existingItem) {
       setCart(cart.map(item =>
         item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
       ));
     } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+      // Cart-e price hobe discounted price
+      setCart([...cart, { ...product, price: priceToCharge, quantity: 1 }]);
     }
   };
 
@@ -49,159 +80,208 @@ const AdminPos = () => {
     setCart(cart.filter(item => item._id !== id));
   };
 
-  // Calculations
-  const subTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subTotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [cart]);
 
-  // ================= CHECKOUT HANDLER =================
   const handleCheckout = async () => {
     if (cart.length === 0) return Swal.fire('Empty!', 'Cart-e kisu nai.', 'warning');
-
-    setLoading(true); // ✅ Ekhon eita kaj korbe
+    
+    setLoading(true);
     try {
-      // Backend-e data pathano
-      await axios.post('http://localhost:5000/api/checkout', {
+      const payload = {
+        invoiceNo: invoiceNumber,
+        customerName: customer.name || "Walk-in Guest",
+        customerPhone: customer.phone || "N/A",
         cart: cart,
         totalAmount: subTotal,
-      });
+      };
 
-      Swal.fire({
-        title: 'Order Placed!',
-        text: `Total: ৳${subTotal} - Stock updated.`,
-        icon: 'success',
-        showCancelButton: true,
-        confirmButtonText: 'Print Receipt',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.print();
-        }
-      });
+      const res = await axios.post('http://localhost:5000/api/checkout', payload);
 
-      setCart([]); 
-      // Updated stock fetch kora
-      const res = await axios.get('http://localhost:5000/products');
-      setProducts(res.data);
+      if (res.status === 200 || res.status === 201) {
+        await Swal.fire({
+          title: 'Order Placed!',
+          icon: 'success',
+          timer: 800,
+          showConfirmButton: false
+        });
+        
+        handlePrint();
 
+        setTimeout(() => {
+          setCart([]);
+          setCustomer({ name: "", phone: "" });
+          setInvoiceNumber(generateInvoiceNumber());
+          fetchProducts();
+        }, 1000);
+      }
     } catch (err) {
       console.error(err);
       Swal.fire('Error', 'Checkout failed!', 'error');
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 min-h-screen bg-[#F3F4F6]">
-      
-      {/* 🟢 LEFT SIDE: PRODUCT SELECTION */}
-      <div className="lg:w-2/3 p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-black uppercase tracking-tighter italic text-black">Elite POS Terminal</h2>
-          <p className="text-[10px] text-gray-400 uppercase tracking-[4px]">Direct Inventory Sales</p>
-        </div>
-
-        {/* --- PREMIUM SEARCH BAR --- */}
-        <div className="relative mb-8 shadow-sm">
-          <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
-          <input 
-            type="text" 
-            placeholder="Search by product name (Type 'p', 's', 't' to filter)..." 
-            className="w-full pl-12 pr-4 py-5 bg-white border-none outline-none focus:ring-2 ring-black font-bold transition-all shadow-lg text-lg"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        {/* --- PRODUCT GRID --- */}
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
-          {filteredProducts.map(p => (
-            <div 
-              key={p._id} 
-              onClick={() => addToCart(p)} 
-              className="bg-white group relative overflow-hidden border-2 border-transparent hover:border-black cursor-pointer transition-all duration-300 shadow-md p-0"
-            >
-              <div className="aspect-square overflow-hidden bg-gray-100">
-                <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              </div>
-              <div className="p-3">
-                <h4 className="text-[11px] font-black uppercase truncate tracking-tighter">{p.title}</h4>
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-sm font-black italic">৳{p.price}</p>
-                  <span className="text-[9px] bg-gray-100 px-2 py-1 font-bold">STOCK: {p.stock}</span>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                 <div className="bg-black text-white p-2 rounded-full shadow-xl"><HiPlus /></div>
-              </div>
+    <div className="min-h-screen bg-[#F3F4F6] font-sans">
+      <div className="flex flex-col lg:flex-row gap-0 min-h-screen print:hidden">
+        
+        {/* LEFT SIDE: PRODUCTS */}
+        <div className="lg:w-2/3 p-6">
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-3xl font-black uppercase tracking-tighter italic text-black">ONE POINT PLUS</h2>
+              <p className="text-[10px] text-gray-400 uppercase tracking-[4px]">Operator: {user?.name || "Admin"}</p>
             </div>
-          ))}
+            <div className="text-right">
+                <p className="text-[10px] font-bold text-gray-400">INVOICE NO</p>
+                <p className="font-black text-black">#{invoiceNumber}</p>
+            </div>
+          </div>
+
+          <div className="relative mb-8">
+            <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+            <input 
+              type="text" 
+              placeholder="Search product..." 
+              className="w-full pl-12 pr-4 py-4 bg-white rounded-xl outline-none focus:ring-2 ring-black font-bold shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto max-h-[70vh] pr-2">
+            {filteredProducts.map(p => {
+              const currentPrice = getEffectivePrice(p);
+              const hasDiscount = Number(p.discount) > 0;
+
+              return (
+                <div key={p._id} onClick={() => addToCart(p)} className="bg-white group rounded-xl overflow-hidden border-2 border-transparent hover:border-black cursor-pointer transition-all shadow-sm relative">
+                  {hasDiscount && (
+                    <span className="absolute top-2 right-2 bg-red-600 text-white text-[8px] font-black px-2 py-1 rounded-full z-10">
+                      -{p.discount}%
+                    </span>
+                  )}
+                  <div className="aspect-square bg-gray-100">
+                    <img src={p.image} className="w-full h-full object-cover" alt="" />
+                  </div>
+                  <div className="p-3">
+                    <h4 className="text-[11px] font-black uppercase truncate">{p.title}</h4>
+                    <div className="flex justify-between items-end mt-1">
+                      <div>
+                        {hasDiscount && (
+                          <p className="text-[9px] text-gray-400 line-through">৳{p.price}</p>
+                        )}
+                        <p className="text-sm font-black text-black">৳{currentPrice}</p>
+                      </div>
+                      <span className="text-[9px] font-bold text-gray-400 uppercase">Stock: {p.stock}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: BILLING */}
+        <div className="lg:w-1/3 bg-white shadow-2xl flex flex-col h-screen sticky top-0">
+          <div className="p-6 bg-gray-50 border-b flex justify-between items-center">
+            <h3 className="text-sm font-black uppercase flex items-center gap-2"><HiOutlineShoppingCart/> Order List</h3>
+            <span className="bg-black text-white text-[10px] px-3 py-1 rounded-full">{cart.length}</span>
+          </div>
+
+          <div className="p-4 space-y-2 border-b">
+            <input 
+              type="text" placeholder="Customer Name" 
+              className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
+              value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})}
+            />
+            <input 
+              type="text" placeholder="Phone Number" 
+              className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
+              value={customer.phone} onChange={(e) => setCustomer({...customer, phone: e.target.value})}
+            />
+          </div>
+
+          <div className="flex-grow overflow-y-auto p-4 space-y-3">
+            {cart.map((item) => (
+              <div key={item._id} className="flex gap-3 items-center bg-gray-50 p-2 rounded-lg">
+                <div className="flex-grow">
+                  <h5 className="text-[10px] font-black uppercase truncate w-32">{item.title}</h5>
+                  <p className="text-xs font-bold">৳{item.price * item.quantity}</p>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-2 py-1 rounded border">
+                  <button onClick={() => updateQuantity(item._id, -1)}><HiMinus size={10}/></button>
+                  <span className="text-xs font-black">{item.quantity}</span>
+                  <button onClick={() => updateQuantity(item._id, 1)}><HiPlus size={10}/></button>
+                </div>
+                <button onClick={() => removeFromCart(item._id)} className="text-red-400"><HiOutlineTrash size={16}/></button>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-6 bg-black text-white">
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-xs font-bold uppercase opacity-60">Total Amount</span>
+              <span className="text-3xl font-black text-yellow-400">৳{subTotal}</span>
+            </div>
+            <button 
+              onClick={handleCheckout} 
+              disabled={loading}
+              className="w-full bg-yellow-400 text-black py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2"
+            >
+              {loading ? 'Processing...' : <><Printer size={18}/> Finalize & Print</>}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 🔴 RIGHT SIDE: BILLING PANEL */}
-      <div className="lg:w-1/3 bg-white shadow-[-10px_0px_30px_rgba(0,0,0,0.05)] flex flex-col h-screen sticky top-0">
-        <div className="p-6 border-b-2 border-gray-50 flex justify-between items-center">
-          <h3 className="text-sm font-black uppercase tracking-[3px] flex items-center gap-2">
-            <HiOutlineShoppingCart className="text-xl"/> Current Order
-          </h3>
-          <span className="bg-black text-white text-[10px] px-2 py-1 font-black">{cart.length} ITEMS</span>
-        </div>
+      {/* 🔴 THERMAL RECEIPT SECTION */}
+      <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
+        <div ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
+          <div className="text-center border-b border-dashed border-black pb-2 mb-2">
+            <h1 className="text-lg font-bold">ONE POINT PLUS</h1>
+            <p className="text-[10px]">Aurangzeb Road, Pabna</p>
+            <div className="border-b border-black border-dashed my-2"></div>
+            <p className="font-bold uppercase">Cash Receipt</p>
+          </div>
 
-        {/* --- CART ITEMS --- */}
-        <div className="flex-grow overflow-y-auto p-6 space-y-4">
-          {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full opacity-20 italic">
-              <HiOutlineShoppingCart size={60} />
-              <p className="text-xs uppercase font-bold mt-4 tracking-widest">Awaiting selection...</p>
+          <div className="mb-2 space-y-1 text-[10px]">
+            <div className="flex justify-between font-bold">
+              <span>Inv: #{invoiceNumber}</span>
+              <span>{new Date().toLocaleDateString()}</span>
             </div>
-          ) : (
-            cart.map((item) => (
-              <div key={item._id} className="flex gap-4 items-center bg-gray-50 p-3 border-l-4 border-black group">
-                <img src={item.image} className="w-12 h-12 object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
-                <div className="flex-grow">
-                  <h5 className="text-[10px] font-black uppercase truncate w-32">{item.title}</h5>
-                  <p className="text-xs font-bold mt-1">৳{item.price * item.quantity}</p>
-                </div>
-                <div className="flex items-center gap-3 bg-white border border-gray-200 px-2 py-1">
-                  <button onClick={() => updateQuantity(item._id, -1)} className="hover:text-red-500"><HiMinus size={12}/></button>
-                  <span className="text-xs font-black">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item._id, 1)} className="hover:text-green-500"><HiPlus size={12}/></button>
-                </div>
-                <button onClick={() => removeFromCart(item._id)} className="text-gray-300 hover:text-red-600 transition-colors">
-                  <HiOutlineTrash size={18}/>
-                </button>
+            <p>Customer: {customer.name || "Walk-in"}</p>
+            <p>Phone: {customer.phone || "N/A"}</p>
+          </div>
+
+          <div className="border-t border-b border-black border-dashed py-2 my-2">
+            <div className="flex justify-between font-bold mb-1 text-[10px]">
+              <span className="w-1/2">Item</span>
+              <span className="w-1/4 text-center">Qty</span>
+              <span className="w-1/4 text-right">Price</span>
+            </div>
+            {cart.map((item, i) => (
+              <div key={i} className="flex justify-between text-[10px] leading-tight mb-1">
+                <span className="w-1/2 uppercase truncate">{item.title}</span>
+                <span className="w-1/4 text-center">{item.quantity}</span>
+                <span className="w-1/4 text-right">৳{item.price * item.quantity}</span>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* --- TOTAL & CHECKOUT --- */}
-        <div className="p-8 bg-black text-white">
-          <div className="space-y-2 mb-6 opacity-80">
-            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-              <span>Subtotal:</span>
-              <span>৳{subTotal}</span>
-            </div>
-          </div>
-          
-          <div className="flex justify-between items-end mb-8 border-t border-white/20 pt-4">
-            <span className="text-xs font-bold uppercase opacity-60">Grand Total</span>
-            <span className="text-4xl font-black italic tracking-tighter text-yellow-400">৳{subTotal.toLocaleString()}</span>
+            ))}
           </div>
 
-          <button 
-            onClick={handleCheckout}
-            disabled={loading} // Loading hole button off thakbe
-            className="w-full bg-white text-black py-5 font-black uppercase tracking-[5px] text-xs hover:bg-yellow-400 transition-all active:scale-95 shadow-xl disabled:bg-gray-500"
-          >
-            {loading ? 'Processing...' : 'Finalize & Print'}
-          </button>
-          
-          <button 
-            onClick={() => setCart([])}
-            className="w-full text-[9px] font-black uppercase tracking-widest mt-6 opacity-40 hover:opacity-100 transition-opacity"
-          >
-            Discard Transaction
-          </button>
+          <div className="flex justify-between font-black text-[12px] mt-2 border-t pt-2 border-double border-black">
+            <span>TOTAL</span>
+            <span>৳{subTotal}.00</span>
+          </div>
+
+          <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
+            <p className="font-bold uppercase">Thank You!</p>
+            <p className="text-[9px]">Exchange possible within 3 days (with receipt)</p>
+            <p className="text-[10px] mt-2 font-black italic">ONE POINT PLUS</p>
+          </div>
         </div>
       </div>
     </div>

@@ -15,18 +15,43 @@
   @apply text-[13px] font-medium uppercase tracking-wider hover:text-gray-500 transition-colors;
 }
 
-
+/* ============================================================
+   🖨️ PRINT LOGIC (Puraton sob delete kore sudhu eita thakbe)
+   ============================================================ */
 @media print {
+  /* 1. Hide everything by default */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
-  #printable-memo, #printable-memo * {
-    visibility: visible;
+
+  /* 2. ONLY show the receipt and its internal elements */
+  #printable-receipt, #printable-receipt * {
+    visibility: visible !important;
+    display: block !important; /* Ensure it's not hidden */
   }
-  #printable-memo {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+
+  /* 3. Position the receipt at the very top-left of the paper */
+  #printable-receipt {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80mm !important;
+    padding: 5mm !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* 4. Fix flexbox for the receipt items (price/qty alignment) */
+  #printable-receipt .flex {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  /* 5. Set the paper size for thermal printers */
+  @page {
+    size: 80mm auto;
+    margin: 0;
   }
 }
