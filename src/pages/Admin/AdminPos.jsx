@@ -262,7 +262,6 @@ const AdminPos = () => {
     )}
   </div>
 
-  {/* Footer Checkout Section - Eita ekhon fix thakbe upore */}
   <div className="p-8 bg-white border-t-2 border-slate-50 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
     <div className="flex justify-between items-center mb-6">
       <div>
@@ -276,13 +275,13 @@ const AdminPos = () => {
     
    <button 
   onClick={() => {
-    // 🛑 Validation: Name ba Phone missing thakle SweetAlert Error
+    // Validation: Name ba Phone missing thakle SweetAlert Error
     if (!customer.name || !customer.phone) {
       Swal.fire({
         title: 'Missing Information!',
         text: 'Please provide customer name and phone number to proceed.',
         icon: 'warning',
-        confirmButtonColor: '#6366f1', // Indigo color matching your UI
+        confirmButtonColor: '#6366f1',
         confirmButtonText: 'Got it!',
         background: '#ffffff',
         customClass: {
@@ -294,7 +293,7 @@ const AdminPos = () => {
       return;
     }
 
-    // ✅ Success check before final checkout
+    // Success check before final checkout
     Swal.fire({
       title: 'Finalize Order?',
       text: "Are you sure you want to complete this transaction?",
@@ -312,7 +311,7 @@ const AdminPos = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        handleCheckout(); // Everything okay, now call the function
+        handleCheckout(); 
       }
     });
   }} 
@@ -335,37 +334,37 @@ const AdminPos = () => {
 
       {/* 🔴 THERMAL RECEIPT SECTION */}
       <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
-        <div ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
+        <div id="printable-receipt" ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
           <div className="text-center border-b border-dashed border-black pb-2 mb-2">
-            <h1 className="text-lg font-bold">ONE POINT PLUS</h1>
-            <p className="text-[10px]">Aurangzeb Road, Pabna</p>
+            <h1 className="text-xl font-bold uppercase">ONE POINT PLUS</h1>
+            <p className="text-[10px]">City Centre, Ground Floor Aurangzeb Road, Pabna</p>
             <div className="border-b border-black border-dashed my-2"></div>
             <p className="font-bold uppercase">Cash Receipt</p>
           </div>
 
-          <div className="mb-2 space-y-1 text-[10px]">
-            <div className="flex justify-between font-bold">
-              <span>Inv: #{invoiceNumber}</span>
-              <span>{new Date().toLocaleDateString()}</span>
-            </div>
-            <p>Customer: {customer.name || "Walk-in"}</p>
-            <p>Phone: {customer.phone || "N/A"}</p>
-          </div>
-
-          <div className="border-t border-b border-black border-dashed py-2 my-2">
-            <div className="flex justify-between font-bold mb-1 text-[10px]">
-              <span className="w-1/2">Item</span>
-              <span className="w-1/4 text-center">Qty</span>
-              <span className="w-1/4 text-right">Price</span>
-            </div>
-            {cart.map((item, i) => (
-              <div key={i} className="flex justify-between text-[10px] leading-tight mb-1">
-                <span className="w-1/2 uppercase truncate">{item.title}</span>
-                <span className="w-1/4 text-center">{item.quantity}</span>
-                <span className="w-1/4 text-right">৳{item.price * item.quantity}</span>
-              </div>
-            ))}
-          </div>
+         <div className="mb-1 space-y-1 text-[9px] text-left"> 
+  <div className="flex justify-between font-bold text-[9px]"> 
+    <span>Inv: #{invoiceNumber}</span>
+    <span>{new Date().toLocaleDateString()}</span>
+  </div>
+  <div className="border-b border-black border-dotted my-1"></div>
+  <p className="truncate">Customer: {customer.name || "Walk-in"}</p>
+  <p className="truncate">Phone: {customer.phone || "N/A"}</p>
+</div>
+        <div className="border-t border-b border-black border-dashed py-2 my-2">
+  <div className="flex justify-start font-bold mb-1 text-[10px]">
+    <span className="w-1/2 text-left">Item</span>
+    <span className="w-1/4 text-left text-center">Qty</span>
+    <span className="w-1/4 text-left text-right">Price</span>
+  </div>
+  {cart.map((item, i) => (
+    <div key={i} className="flex justify-start text-[10px] leading-tight mb-1">
+      <span className="w-1/2 text-left uppercase truncate">{item.title}</span>
+      <span className="w-1/4 text-left text-center">{item.quantity}</span>
+      <span className="w-1/4 text-left text-right">৳{item.price * item.quantity}</span>
+    </div>
+  ))}
+</div>
 
           <div className="flex justify-between font-black text-[12px] mt-2 border-t pt-2 border-double border-black">
             <span>TOTAL</span>
@@ -374,7 +373,6 @@ const AdminPos = () => {
 
           <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
             <p className="font-bold uppercase">Thank You!</p>
-            <p className="text-[9px]">Exchange possible within 3 days (with receipt)</p>
             <p className="text-[10px] mt-2 font-black italic">ONE POINT PLUS</p>
           </div>
         </div>
