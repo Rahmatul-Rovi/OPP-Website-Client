@@ -75,12 +75,7 @@ const Sidebar = () => {
         </NavLink>
       </nav>
 
-      {/* Logout Button - Stayed at Bottom */}
-      <div className="absolute bottom-10 left-0 w-full px-6">
-        <button className="flex items-center justify-center gap-3 w-full py-3 border border-red-900/30 text-[10px] font-black uppercase tracking-[2px] text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 rounded-sm">
-          <HiOutlineLogout className="text-lg" /> Logout System
-        </button>
-      </div>
+    
     </div>
   );
 };

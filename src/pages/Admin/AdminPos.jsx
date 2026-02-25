@@ -13,6 +13,7 @@ const AdminPos = () => {
   const [loading, setLoading] = useState(false);
   const [customer, setCustomer] = useState({ name: "", phone: "" });
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [manualDiscount, setManualDiscount] = useState(0); 
   
   const componentRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
@@ -33,7 +34,7 @@ const AdminPos = () => {
     }
   };
 
-  // 🟢 Helper: Discounted Price Calculate 
+  // Helper: Discounted Price Calculate 
   const getEffectivePrice = (product) => {
     const mainPrice = Number(product.price || 0);
     const discPercent = Number(product.discount || 0);
@@ -96,6 +97,11 @@ const AdminPos = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }, [cart]);
 
+const finalPayable = useMemo(() => {
+  const discountAmount = (subTotal * Number(manualDiscount)) / 100;
+  return subTotal - discountAmount;
+}, [subTotal, manualDiscount]);
+
   const handleCheckout = async () => {
     if (cart.length === 0) return Swal.fire('Empty!', 'Cart-e kisu nai.', 'warning');
     
@@ -106,7 +112,8 @@ const AdminPos = () => {
         customerName: customer.name || "Walk-in Guest",
         customerPhone: customer.phone || "N/A",
         cart: cart,
-        totalAmount: subTotal,
+        totalAmount: finalPayable,
+      discountPercent: manualDiscount
       };
 
       const res = await axios.post('http://localhost:5000/api/checkout', payload);
@@ -254,17 +261,34 @@ const AdminPos = () => {
         <HiOutlineShoppingCart size={48} className="mb-2 opacity-20"/>
         <p className="text-[10px] font-black uppercase tracking-widest">Cart is empty</p>
       </div>
+      
     )}
   </div>
+  {/* Discount Section */}
+<div className="p-4 bg-red-50/50 border-b border-red-100">
+  <label className="text-[10px] font-black uppercase text-red-400 mb-1 block ml-1">Extra Discount (%)</label>
+  <div className="relative">
+    <input 
+      type="number" 
+      placeholder="0" 
+      className="w-full text-sm font-black p-3 bg-white border-2 border-red-100 rounded-xl outline-none focus:border-red-500 transition-all"
+      value={manualDiscount} 
+      onChange={(e) => setManualDiscount(e.target.value)}
+      min="0"
+      max="100"
+    />
+    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-red-400">%</span>
+  </div>
+</div>
 
   <div className="p-8 bg-white border-t-2 border-slate-50 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
     <div className="flex justify-between items-center mb-6">
       <div>
         <span className="text-[10px] font-black uppercase text-slate-400 block tracking-widest">Payable Amount</span>
-        <span className="text-3xl font-black text-slate-900 tracking-tighter">৳{subTotal}</span>
+        <span className="text-3xl font-black text-slate-900 tracking-tighter">৳{finalPayable}</span>
       </div>
       <div className="text-right">
-         <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-1 rounded">Vat Incl.</span>
+         <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-1 rounded">-{manualDiscount}% OFF</span>
       </div>
     </div>
     
@@ -327,51 +351,69 @@ const AdminPos = () => {
 </div>
       </div>
 
-      {/* 🔴 THERMAL RECEIPT SECTION */}
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
-        <div id="printable-receipt" ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
-          <div className="text-center border-b border-dashed border-black pb-2 mb-2">
-            <h1 className="text-xl font-bold uppercase">ONE POINT PLUS</h1>
-            <p className="text-[10px]">City Centre, Ground Floor Aurangzeb Road, Pabna</p>
-            <div className="border-b border-black border-dashed my-2"></div>
-            <p className="font-bold uppercase">Cash Receipt</p>
-          </div>
-
-         <div className="mb-1 space-y-1 text-[9px] text-left"> 
-  <div className="flex justify-between font-bold text-[9px]"> 
-    <span>Inv: #{invoiceNumber}</span>
-    <span>{new Date().toLocaleDateString()}</span>
-  </div>
-  <div className="border-b border-black border-dotted my-1"></div>
-  <p className="truncate">Customer: {customer.name || "Walk-in"}</p>
-  <p className="truncate">Phone: {customer.phone || "N/A"}</p>
-</div>
-        <div className="border-t border-b border-black border-dashed py-2 my-2">
-  <div className="flex justify-start font-bold mb-1 text-[10px]">
-    <span className="w-1/2 text-left">Item</span>
-    <span className="w-1/4 text-left text-center">Qty</span>
-    <span className="w-1/4 text-left text-right">Price</span>
-  </div>
-  {cart.map((item, i) => (
-    <div key={i} className="flex justify-start text-[10px] leading-tight mb-1">
-      <span className="w-1/2 text-left uppercase truncate">{item.title}</span>
-      <span className="w-1/4 text-left text-center">{item.quantity}</span>
-      <span className="w-1/4 text-left text-right">৳{item.price * item.quantity}</span>
+  {/*  THERMAL RECEIPT SECTION */}
+<div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
+  <div id="printable-receipt" ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
+    
+    <div className="text-center border-b border-dashed border-black pb-2 mb-2">
+      <h1 className="text-xl font-bold uppercase">ONE POINT PLUS</h1>
+      <p className="text-[10px]">City Centre, Ground Floor Aurangzeb Road, Pabna</p>
+      <div className="border-b border-black border-dashed my-2"></div>
+      <p className="font-bold uppercase">Cash Receipt</p>
     </div>
-  ))}
-</div>
 
-          <div className="flex justify-between font-black text-[12px] mt-2 border-t pt-2 border-double border-black">
-            <span>TOTAL</span>
-            <span>৳{subTotal}.00</span>
-          </div>
-
-          <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
-            <p className="font-bold uppercase">Thank You!</p>
-            <p className="text-[10px] mt-2 font-black italic">ONE POINT PLUS</p>
-          </div>
-        </div>
+    <div className="mb-1 space-y-1 text-[9px] text-left"> 
+      <div className="flex justify-between font-bold text-[9px]"> 
+        <span>Inv: #{invoiceNumber}</span>
+        <span>{new Date().toLocaleDateString()}</span>
       </div>
+      <div className="border-b border-black border-dotted my-1"></div>
+      <p className="truncate">Customer: {customer.name || "Walk-in"}</p>
+      <p className="truncate">Phone: {customer.phone || "N/A"}</p>
+    </div>
+
+    {/* Items List */}
+    <div className="border-t border-b border-black border-dashed py-2 my-2">
+      <div className="flex justify-start font-bold mb-1 text-[10px]">
+        <span className="w-1/2 text-left">Item</span>
+        <span className="w-1/4 text-center">Qty</span>
+        <span className="w-1/4 text-right">Price</span>
+      </div>
+      {cart.map((item, i) => (
+        <div key={i} className="flex justify-start text-[10px] leading-tight mb-1">
+          <span className="w-1/2 text-left uppercase truncate">{item.title}</span>
+          <span className="w-1/4 text-center">{item.quantity}</span>
+          <span className="w-1/4 text-right">৳{item.price * item.quantity}</span>
+        </div>
+      ))}
+    </div>
+
+    <div className="border-t border-black border-dashed pt-1 mt-2">
+      <div className="flex justify-between text-[10px]">
+        <span>Subtotal</span>
+        <span>৳{subTotal}.00</span>
+      </div>
+      
+      {manualDiscount > 0 && (
+        <div className="flex justify-between text-[10px]">
+          <span>Extra Discount ({manualDiscount}%)</span>
+          <span>- ৳{(subTotal * manualDiscount) / 100}</span>
+        </div>
+      )}
+
+      <div className="flex justify-between font-black text-[12px] mt-1 border-t border-black pt-1">
+        <span>NET PAYABLE</span>
+        <span>৳{finalPayable}.00</span>
+      </div>
+    </div>
+
+    {/* Footer */}
+    <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
+      <p className="font-bold uppercase">Thank You!</p>
+      <p className="text-[10px] mt-2 font-black italic">ONE POINT PLUS</p>
+    </div>
+  </div>
+</div>
     </div>
   );
 };
