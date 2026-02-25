@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 export default function ProductCard({ product }) {
   if (!product) return null;
 
-  // Discount logic (optional, kintu thaka bhalo)
   const hasDiscount = Number(product.discount) > 0;
   const discountedPrice = hasDiscount 
     ? Math.round(product.price - (product.price * product.discount / 100)) 
@@ -20,7 +19,6 @@ export default function ProductCard({ product }) {
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
         />
         
-        {/* 🟢 View Details Overlay - Link ta thik kora hoyeche */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
           <Link 
             to={`/product/${product._id}`} 

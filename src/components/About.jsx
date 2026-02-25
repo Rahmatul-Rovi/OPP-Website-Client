@@ -21,7 +21,7 @@ const About = () => {
             <img 
               src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070" 
               alt="Our Showroom" 
-              className="w-full h-[500px] object-cover rounded-sm grayscale group-hover:grayscale-0 transition-all duration-700"
+              className="w-full h-[500px] object-cover rounded-sm  transition-all duration-700"
             />
             <div className="absolute bottom-6 left-6 bg-white p-4 shadow-xl">
               <p className="text-[10px] font-black uppercase tracking-widest">Premium Shopping Experience</p>

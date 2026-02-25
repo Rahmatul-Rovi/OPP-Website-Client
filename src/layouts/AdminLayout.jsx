@@ -7,7 +7,6 @@ const AdminLayout = () => {
     <div className="flex bg-gray-50 min-h-screen">
       <Sidebar />
       <div className="flex-grow p-10">
-        {/* Eikhane admin er baki page gulo show korbe */}
         <Outlet />
       </div>
     </div>
