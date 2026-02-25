@@ -5,6 +5,7 @@ import { Printer } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useReactToPrint } from 'react-to-print';
 
+
 const AdminPos = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,56 +201,136 @@ const AdminPos = () => {
         </div>
 
         {/* RIGHT SIDE: BILLING */}
-        <div className="lg:w-1/3 bg-white shadow-2xl flex flex-col h-screen sticky top-0">
-          <div className="p-6 bg-gray-50 border-b flex justify-between items-center">
-            <h3 className="text-sm font-black uppercase flex items-center gap-2"><HiOutlineShoppingCart/> Order List</h3>
-            <span className="bg-black text-white text-[10px] px-3 py-1 rounded-full">{cart.length}</span>
-          </div>
+<div className="lg:w-1/3 bg-white shadow-2xl flex flex-col h-screen sticky top-0 border-l border-slate-200">
+  
+  {/* Header */}
+  <div className="p-6 bg-white border-b flex justify-between items-center">
+    <h3 className="text-lg font-black uppercase tracking-tighter flex items-center gap-2 text-slate-800">
+      <HiOutlineShoppingCart className="text-indigo-600"/> Order Summary
+    </h3>
+    <span className="bg-indigo-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg shadow-indigo-100">
+      {cart.length} Items
+    </span>
+  </div>
 
-          <div className="p-4 space-y-2 border-b">
-            <input 
-              type="text" required placeholder="Customer Name" 
-              className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
-              value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})}
-            />
-            <input 
-              type="text" required placeholder="Phone Number" 
-              className="w-full text-xs p-2 bg-gray-100 rounded outline-none"
-              value={customer.phone} onChange={(e) => setCustomer({...customer, phone: e.target.value})}
-            />
-          </div>
+  {/* Customer Info Section - Font size boro kora hoyeche */}
+  <div className="p-6 space-y-4 bg-slate-50/50 border-b">
+    <div>
+      <label className="text-[10px] font-black uppercase text-slate-400 mb-1 block ml-1">Customer Details</label>
+      <input 
+        type="text" 
+        placeholder="ENTER CUSTOMER NAME" 
+        className="w-full text-sm font-bold p-4 bg-white border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 transition-all placeholder:text-slate-300 uppercase"
+        value={customer.name} 
+        onChange={(e) => setCustomer({...customer, name: e.target.value})}
+      />
+    </div>
+    <input 
+      type="number" 
+      placeholder="PHONE NUMBER (11 DIGITS)" 
+      className="w-full text-sm font-bold p-4 bg-white border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 transition-all placeholder:text-slate-300"
+      value={customer.phone} 
+      onChange={(e) => setCustomer({...customer, phone: e.target.value})}
+    />
+  </div>
 
-          <div className="flex-grow overflow-y-auto p-4 space-y-3">
-            {cart.map((item) => (
-              <div key={item._id} className="flex gap-3 items-center bg-gray-50 p-2 rounded-lg">
-                <div className="flex-grow">
-                  <h5 className="text-[10px] font-black uppercase truncate w-32">{item.title}</h5>
-                  <p className="text-xs font-bold">৳{item.price * item.quantity}</p>
-                </div>
-                <div className="flex items-center gap-2 bg-white px-2 py-1 rounded border">
-                  <button onClick={() => updateQuantity(item._id, -1)}><HiMinus size={10}/></button>
-                  <span className="text-xs font-black">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item._id, 1)}><HiPlus size={10}/></button>
-                </div>
-                <button onClick={() => removeFromCart(item._id)} className="text-red-400"><HiOutlineTrash size={16}/></button>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-6 bg-black text-white">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-xs font-bold uppercase opacity-60">Total Amount</span>
-              <span className="text-3xl font-black text-yellow-400">৳{subTotal}</span>
-            </div>
-            <button 
-              onClick={handleCheckout} 
-              disabled={loading}
-              className="w-full bg-yellow-400 text-black py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2"
-            >
-              {loading ? 'Processing...' : <><Printer size={18}/> Finalize & Print</>}
-            </button>
-          </div>
+  {/* Cart Items - Scrollable height manage kora hoyeche */}
+  <div className="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
+    {cart.length > 0 ? cart.map((item) => (
+      <div key={item._id} className="flex gap-4 items-center bg-white border border-slate-100 p-3 rounded-2xl hover:shadow-md transition-shadow">
+        <div className="flex-grow">
+          <h5 className="text-[11px] font-black uppercase text-slate-800 leading-tight mb-1">{item.title}</h5>
+          <p className="text-sm font-black text-indigo-600">৳{item.price * item.quantity}</p>
         </div>
+        
+        {/* Counter */}
+        <div className="flex items-center gap-3 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
+          <button onClick={() => updateQuantity(item._id, -1)} className="hover:text-indigo-600 transition-colors"><HiMinus size={12}/></button>
+          <span className="text-xs font-black w-4 text-center">{item.quantity}</span>
+          <button onClick={() => updateQuantity(item._id, 1)} className="hover:text-indigo-600 transition-colors"><HiPlus size={12}/></button>
+        </div>
+        
+        <button onClick={() => removeFromCart(item._id)} className="text-slate-300 hover:text-red-500 transition-colors p-1">
+          <HiOutlineTrash size={20}/>
+        </button>
+      </div>
+    )) : (
+      <div className="h-full flex flex-col items-center justify-center text-slate-300">
+        <HiOutlineShoppingCart size={48} className="mb-2 opacity-20"/>
+        <p className="text-[10px] font-black uppercase tracking-widest">Cart is empty</p>
+      </div>
+    )}
+  </div>
+
+  {/* Footer Checkout Section - Eita ekhon fix thakbe upore */}
+  <div className="p-8 bg-white border-t-2 border-slate-50 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <span className="text-[10px] font-black uppercase text-slate-400 block tracking-widest">Payable Amount</span>
+        <span className="text-3xl font-black text-slate-900 tracking-tighter">৳{subTotal}</span>
+      </div>
+      <div className="text-right">
+         <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-1 rounded">Vat Incl.</span>
+      </div>
+    </div>
+    
+   <button 
+  onClick={() => {
+    // 🛑 Validation: Name ba Phone missing thakle SweetAlert Error
+    if (!customer.name || !customer.phone) {
+      Swal.fire({
+        title: 'Missing Information!',
+        text: 'Please provide customer name and phone number to proceed.',
+        icon: 'warning',
+        confirmButtonColor: '#6366f1', // Indigo color matching your UI
+        confirmButtonText: 'Got it!',
+        background: '#ffffff',
+        customClass: {
+          title: 'font-black uppercase tracking-tight',
+          popup: 'rounded-[24px]',
+          confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase text-xs'
+        }
+      });
+      return;
+    }
+
+    // ✅ Success check before final checkout
+    Swal.fire({
+      title: 'Finalize Order?',
+      text: "Are you sure you want to complete this transaction?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#000000',
+      cancelButtonColor: '#ef4444',
+      confirmButtonText: 'YES, PRINT NOW',
+      cancelButtonText: 'NO, WAIT',
+      reverseButtons: true,
+      customClass: {
+        popup: 'rounded-[32px]',
+        confirmButton: 'rounded-2xl px-6 py-3 font-black text-xs uppercase',
+        cancelButton: 'rounded-2xl px-6 py-3 font-black text-xs uppercase text-slate-400'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleCheckout(); // Everything okay, now call the function
+      }
+    });
+  }} 
+  disabled={loading || cart.length === 0}
+  className={`w-full py-5 rounded-[20px] font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 transition-all transform active:scale-95 ${
+    (!customer.name || !customer.phone || cart.length === 0) 
+    ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
+    : 'bg-slate-900 text-white shadow-2xl shadow-slate-200 hover:bg-black'
+  }`}
+>
+  {loading ? (
+    <span className="animate-pulse italic">Processing...</span>
+  ) : (
+    <><Printer size={18} className="text-indigo-400"/> Finalize & Print Receipt</>
+  )}
+</button>
+  </div>
+</div>
       </div>
 
       {/* 🔴 THERMAL RECEIPT SECTION */}

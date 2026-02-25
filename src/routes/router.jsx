@@ -12,6 +12,7 @@ import MakeAdmin from '../pages/Admin/MakeAdmin';
 import Inventory from '../pages/Admin/Inventory';
 import ProductDetails from '../pages/ProductDetails';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
+import Login from '../pages/Login';
 
 
 const router = createBrowserRouter([
@@ -38,7 +39,11 @@ const router = createBrowserRouter([
       {
         path: "product/:id",
         Component: ProductDetails
-      }
+      },
+      {
+    path: "/login",
+    element: <Login></Login>
+  },
     ]
   },
   {
