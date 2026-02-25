@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../Providers/AuthProviders';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FcGoogle } from "react-icons/fc";
@@ -16,13 +16,10 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // ✅ Save user to MongoDB
+    // ✅ Save user to MongoDB (Upsert already backend e handle hocche)
     const saveUserToDb = async (user) => {
 
-        if (!user?.email) {
-            console.log("❌ Email not found. User not saved.");
-            return;
-        }
+        if (!user?.email) return;
 
         const userInfo = {
             name: user.displayName || "No Name",
@@ -30,16 +27,27 @@ const Login = () => {
             role: "user"
         };
 
-        console.log("📤 Sending to DB:", userInfo);
-
         try {
-            const res = await axios.post(
-                "http://localhost:5000/users",
-                userInfo
-            );
-            console.log("✅ DB Response:", res.data);
+            await axios.post("http://localhost:5000/users", userInfo);
         } catch (error) {
-            console.error("❌ DB Save Error:", error);
+            console.error("DB Save Error:", error);
+        }
+    };
+
+    // ✅ After login role check & redirect
+    const redirectByRole = async (email) => {
+        try {
+            const res = await axios.get("http://localhost:5000/users");
+            const currentUser = res.data.find(u => u.email === email);
+
+            if (currentUser?.role === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/profile");
+            }
+        } catch (error) {
+            console.error("Role fetch error:", error);
+            navigate("/");
         }
     };
 
@@ -52,14 +60,14 @@ const Login = () => {
 
             await saveUserToDb(result.user);
 
+            await redirectByRole(result.user.email);
+
             Swal.fire({
                 icon: 'success',
                 title: 'Login Successful',
                 timer: 1500,
                 showConfirmButton: false
             });
-
-            navigate('/');
 
         } catch (error) {
 
@@ -70,13 +78,13 @@ const Login = () => {
 
                     await saveUserToDb(result.user);
 
+                    await redirectByRole(result.user.email);
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Account Created',
                         timer: 1500
                     });
-
-                    navigate('/');
 
                 } catch (err) {
                     Swal.fire({
@@ -106,13 +114,13 @@ const Login = () => {
 
             await saveUserToDb(result.user);
 
+            await redirectByRole(result.user.email);
+
             Swal.fire({
                 icon: 'success',
                 title: 'Google Login Successful',
                 timer: 1500
             });
-
-            navigate('/');
 
         } catch (error) {
             Swal.fire({

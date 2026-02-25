@@ -1,13 +1,27 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { HiOutlineUser, HiOutlineShoppingBag, HiOutlineSearch, HiOutlineLogout } from 'react-icons/hi';
+import { HiOutlineUser, HiOutlineShoppingBag, HiOutlineSearch, HiOutlineLogout, HiOutlineViewGrid } from 'react-icons/hi';
 import { AuthContext } from '../Providers/AuthProviders';
+import axios from 'axios';
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
-  // Logo-te click korle refresh shoho home-e jabe
+  // ✅ Check if the logged-in user is an Admin
+  useEffect(() => {
+    if (user?.email) {
+      axios.get(`http://localhost:5000/users/admin/${user.email}`)
+        .then(res => {
+          setIsAdmin(res.data.admin);
+        })
+        .catch(err => console.error("Admin check failed", err));
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
+
   const handleLogoClick = () => {
     navigate('/');
     window.location.reload(); 
@@ -44,28 +58,40 @@ const Navbar = () => {
            </div>
         </div>
 
-        {/* Right: User Icons (Login/Logout System) */}
+        {/* Right: User Icons & Profile */}
         <div className="flex-1 flex justify-end items-center space-x-6">
           
           {user ? (
-            /* ✅ Login thakle shudhu Logout dekhabe */
-            <div className="flex items-center gap-4">
-               <div className="text-right hidden sm:block">
-                  <p className="text-[10px] font-black text-slate-900 uppercase leading-none">
-                    {user.displayName || 'User'}
-                  </p>
-               </div>
+            <div className="flex items-center gap-5">
+               {/* ✅ Dashboard Link: Only for Admin */}
+               {isAdmin && (
+                 <Link to="/admin" className="flex items-center gap-1 text-slate-900 hover:text-blue-600 transition-colors">
+                    <HiOutlineViewGrid className="text-2xl" />
+                    <span className="text-[10px] font-black uppercase hidden sm:block tracking-widest">Dashboard</span>
+                 </Link>
+               )}
+
+               {/* User Info & Profile */}
+               <Link to="/profile" className="flex items-center gap-2 group">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-[9px] font-black text-slate-400 uppercase leading-none">Access Granted</p>
+                    <p className="text-[10px] font-bold text-slate-900 truncate max-w-[80px]">{user.displayName || 'User'}</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 group-hover:border-black transition-all">
+                    <HiOutlineUser className="text-lg text-slate-600" />
+                  </div>
+               </Link>
+               
+               {/* Logout Button */}
                <button 
                 onClick={logOut}
-                className="flex items-center gap-1 group text-slate-400 hover:text-red-500 transition-colors"
+                className="p-2 hover:bg-red-50 rounded-full text-slate-400 hover:text-red-500 transition-colors"
                 title="Logout"
                >
-                  <HiOutlineLogout className="text-2xl" />
-                  <span className="text-[10px] font-black uppercase hidden sm:block tracking-widest">Logout</span>
+                  <HiOutlineLogout className="text-xl" />
                </button>
             </div>
           ) : (
-            /* ✅ Login na thakle Login button dekhabe */
             <Link to="/login" className="flex items-center space-x-1 hover:text-gray-500 transition-colors">
               <HiOutlineUser className="text-2xl" />
               <span className="text-[10px] font-black uppercase hidden sm:block tracking-widest">Login</span>

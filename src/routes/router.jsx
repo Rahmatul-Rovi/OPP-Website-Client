@@ -13,6 +13,8 @@ import Inventory from '../pages/Admin/Inventory';
 import ProductDetails from '../pages/ProductDetails';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
 import Login from '../pages/Login';
+import AdminRoute from './AdminRoute';
+import Profile from '../pages/Profile';
 
 
 const router = createBrowserRouter([
@@ -44,32 +46,40 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login></Login>
   },
+  {
+    path: "profile",
+    Component: Profile
+  }
     ]
   },
-  {
+ {
   path: "/admin",
-  element: <AdminLayout />,
+  element: (
+   <AdminRoute>
+     <AdminLayout />
+   </AdminRoute>
+  ),
   children: [
     {
-      path: "/admin/add-product",
-      element: <AddProduct></AddProduct>
+      index: true,
+      element: <AdminDashboard />
     },
     {
-  path: "pos",
-  element: <AdminPos />
-},
-{
-  path: 'make-admin',
-  Component: MakeAdmin
-},
-{
-  path: "manage-products",
-  Component: Inventory
-},
-{
-  path: "/admin",
-  Component: AdminDashboard
-}
+      path: "add-product",
+      element: <AddProduct />
+    },
+    {
+      path: "pos",
+      element: <AdminPos />
+    },
+    {
+      path: "make-admin",
+      element: <MakeAdmin />
+    },
+    {
+      path: "manage-products",
+      element: <Inventory />
+    }
   ]
 }
 ]);
