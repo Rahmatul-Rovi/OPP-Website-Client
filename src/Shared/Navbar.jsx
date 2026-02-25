@@ -39,7 +39,6 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
-      {/* Top Bar (Padding Komano hoyeche) */}
       <div className="bg-black text-white text-[9px] py-1 text-center uppercase tracking-[3px] font-bold">
         One Point Plus • Official Terminal
       </div>
@@ -55,7 +54,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* ✅ Center: Navigation Links (Upore niye asha hoyeche) */}
         <div className="hidden lg:block">
           <ul className="flex items-center space-x-8 text-[10px] font-black uppercase tracking-[2px]">
             <li>
@@ -85,7 +83,6 @@ const Navbar = () => {
         <div className="flex items-center space-x-5">
           {user ? (
             <div className="flex items-center gap-4">
-              {/* Dashboard Icon Only (Clean looker jonno) */}
               {isAdmin && (
                 <Link
                   to="/admin"
