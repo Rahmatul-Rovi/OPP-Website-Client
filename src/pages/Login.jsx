@@ -15,8 +15,6 @@ const Login = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    // ✅ Save user to MongoDB (Upsert already backend e handle hocche)
     const saveUserToDb = async (user) => {
 
         if (!user?.email) return;
@@ -34,7 +32,7 @@ const Login = () => {
         }
     };
 
-    // ✅ After login role check & redirect
+    // After login role check & redirect
     const redirectByRole = async (email) => {
         try {
             const res = await axios.get("http://localhost:5000/users");
@@ -51,7 +49,7 @@ const Login = () => {
         }
     };
 
-    // ✅ Email/Password Login
+    // Email/Password Login
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -104,7 +102,7 @@ const Login = () => {
         }
     };
 
-    // ✅ Google Login
+    // Google Login
     const handleGoogleLogin = async () => {
 
         const provider = new GoogleAuthProvider();

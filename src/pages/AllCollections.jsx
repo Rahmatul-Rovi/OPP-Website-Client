@@ -23,7 +23,7 @@ const AllCollections = () => {
     fetchAllProducts();
   }, []);
 
-  // 🟢 Filter Logic: Search ar Category eksathe handle korbe
+  // 🟢 Filter Logic: Search ar Category  handle together
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -32,7 +32,7 @@ const AllCollections = () => {
     });
   }, [searchTerm, activeCategory, products]);
 
-  // Unique categories list generate kora
+  // Unique categories list generate 
   const categories = ["All", ...new Set(products.map(p => p.category))];
 
   return (

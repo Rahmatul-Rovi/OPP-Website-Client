@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom'; // 🟢 Link import kora must
+import { Link } from 'react-router-dom';
 import Hero from '../../../components/Hero';
 import ProductCard from '../../../components/ProductCard';
 import Features from '../../../components/Features';
@@ -52,7 +52,6 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* .slice(0, 8) use kora hoyeche jate shudhu 8 ta product show hoy */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
               {products.slice(0, 8).map((item, index) => (
                 <div 
@@ -65,7 +64,7 @@ export default function Home() {
               ))}
             </div>
 
-            {/* 🟢 "View All" Button Section */}
+            {/* "View All" Button Section */}
             {products.length > 8 && (
               <div className="mt-16 flex justify-center" data-aos="fade-up">
                 <Link 

@@ -17,12 +17,11 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                // 🟢 Tumar local server URL maintain kora hoyeche
                 const res = await axios.get(`http://localhost:5000/products/${id}`);
                 setProduct(res.data);
                 
                 // Initial states setup
-                setMainImage(res.data.image); // Single image field handle korar jonne
+                setMainImage(res.data.image); 
                 if (res.data.sizes?.length > 0) setSelectedSize(res.data.sizes[0]);
                 if (res.data.colors?.length > 0) setSelectedColor(res.data.colors[0]);
                 
@@ -66,7 +65,7 @@ const ProductDetails = () => {
         </div>
     );
 
-    // 🟢 Effective Price Calculation (AdminPos er moto same logic)
+    // Effective Price Calculation
     const hasDiscount = Number(product.discount) > 0;
     const discountedPrice = hasDiscount 
         ? Math.round(product.price - (product.price * product.discount / 100)) 
@@ -76,13 +75,12 @@ return (
         <div className="bg-white min-h-screen">
             <div className="max-w-6xl mx-auto px-6 py-8 md:py-16">
                 
-                {/* 🟢 Navigation */}
+                {/* Navigation */}
                 <Link to="/all-collection" className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mb-8 w-fit text-gray-400 hover:text-black transition-colors">
                     <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> 
                     Back to Collection
                 </Link>
 
-                {/* Grid layout fix kora hoyeche (6:6 ratio) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
                     
                     {/* --- LEFT: IMAGE SECTION (Col-6) --- */}

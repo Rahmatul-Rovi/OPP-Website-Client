@@ -11,7 +11,6 @@ import {
 } from 'react-icons/hi';
 
 const Sidebar = () => {
-  // Active thakle eyi style-ta apply hobe
   const activeLink = "flex items-center gap-3 text-sm font-bold uppercase tracking-widest bg-white text-black p-3 rounded-sm transition-all duration-300 shadow-lg";
   const normalLink = "flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white p-3 transition-all duration-300 border-l-2 border-transparent hover:border-blue-500";
 
