@@ -36,7 +36,7 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔒 VALIDATION
+    // VALIDATION
     if (!formData.title || !formData.image) {
       Swal.fire('Error', 'Title & Image required!', 'error');
       return;
@@ -61,7 +61,7 @@ const AddProduct = () => {
         stock: Number(formData.stock)
       };
 
-      console.log("Sending Data:", productData); // 🔍 Debug
+      console.log("Sending Data:", productData);
 
       const response = await axios.post(
         'http://localhost:5000/products',
