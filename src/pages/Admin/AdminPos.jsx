@@ -33,7 +33,7 @@ const AdminPos = () => {
     }
   };
 
-  // 🟢 Helper: Discounted Price Calculate Korar Jonne
+  // 🟢 Helper: Discounted Price Calculate 
   const getEffectivePrice = (product) => {
     const mainPrice = Number(product.price || 0);
     const discPercent = Number(product.discount || 0);
@@ -49,16 +49,13 @@ const AdminPos = () => {
   });
 
  const filteredProducts = products.filter(p => {
-    // Search term-ke alada kora
     const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term !== "");
 
-    // Jodi search box khali thake, shob product dekhaw
     if (searchTerms.length === 0) return true;
 
     return searchTerms.every(term => {
         const titleMatch = p.title?.toLowerCase().includes(term);
         
-        // 🟢 Safe check: price thaklei toString hobe, naile khali string hobe
         const priceString = (p.price !== null && p.price !== undefined) ? p.price.toString() : "";
         const priceMatch = priceString.includes(term);
 
@@ -71,7 +68,7 @@ const AdminPos = () => {
       return Swal.fire("Out of Stock", "Product stock-e nai!", "warning");
     }
 
-    // Discounted price calculate kore cart-e pathacci
+    // Discounted price calculate kore cart-e add
     const priceToCharge = getEffectivePrice(product);
 
     const existingItem = cart.find(item => item._id === product._id);
@@ -80,7 +77,7 @@ const AdminPos = () => {
         item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
       ));
     } else {
-      // Cart-e price hobe discounted price
+      // Cart-e price discounted price
       setCart([...cart, { ...product, price: priceToCharge, quantity: 1 }]);
     }
   };
@@ -213,7 +210,6 @@ const AdminPos = () => {
     </span>
   </div>
 
-  {/* Customer Info Section - Font size boro kora hoyeche */}
   <div className="p-6 space-y-4 bg-slate-50/50 border-b">
     <div>
       <label className="text-[10px] font-black uppercase text-slate-400 mb-1 block ml-1">Customer Details</label>
@@ -234,7 +230,6 @@ const AdminPos = () => {
     />
   </div>
 
-  {/* Cart Items - Scrollable height manage kora hoyeche */}
   <div className="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
     {cart.length > 0 ? cart.map((item) => (
       <div key={item._id} className="flex gap-4 items-center bg-white border border-slate-100 p-3 rounded-2xl hover:shadow-md transition-shadow">
@@ -275,7 +270,7 @@ const AdminPos = () => {
     
    <button 
   onClick={() => {
-    // Validation: Name ba Phone missing thakle SweetAlert Error
+    // Validation: Name ba Phone missing  SweetAlert Error
     if (!customer.name || !customer.phone) {
       Swal.fire({
         title: 'Missing Information!',

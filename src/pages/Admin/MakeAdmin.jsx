@@ -7,10 +7,9 @@ const MakeAdmin = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // User fetch korar function
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/users'); // Path-ta check koro backend-er sathe
+      const res = await axios.get('http://localhost:5000/users');
       setUsers(res.data);
     } catch (err) {
       console.error("User load hoy nai");
@@ -43,7 +42,6 @@ const MakeAdmin = () => {
         try {
           const res = await axios.patch(`http://localhost:5000/users/admin/${user._id}`);
           if (res.data.modifiedCount > 0) {
-            // UI update: Database theke abar load na kore local state update kora (Faster)
             const remaining = users.map(u => u._id === user._id ? { ...u, role: 'admin' } : u);
             setUsers(remaining);
             
