@@ -9,7 +9,7 @@ const Coverage = () => {
     <section className="py-24 bg-white">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
-          <h2 className="text-xs font-bold tracking-[5px] uppercase text-gray-400 mb-3 text-center">Store Locator</h2>
+          <h2 className="text-xs font-bold tracking-[5px] uppercase text-gray-400 mb-3 text-center">Store Location</h2>
           <p className="text-3xl font-black uppercase tracking-tighter text-center">Find Our Showroom</p>
           <div className="h-1 w-12 bg-black mx-auto mt-4"></div>
         </div>
@@ -66,7 +66,7 @@ const Coverage = () => {
             <iframe 
               title="One Point Plus Pabna Showroom"
               src={mapUrl}
-              className="w-full h-full grayscale hover:grayscale-0 transition-all duration-700"
+              className="w-full h-full  transition-all duration-700"
               style={{ border: 0 }} 
               allowFullScreen="" 
               loading="lazy" 

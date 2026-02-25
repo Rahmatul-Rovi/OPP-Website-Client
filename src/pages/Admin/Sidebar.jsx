@@ -6,7 +6,8 @@ import {
   HiOutlineShoppingCart, 
   HiOutlineCalculator, 
   HiOutlineLogout,
-  HiOutlineShieldCheck // Make admin er jonno security icon
+  HiOutlineHome,
+  HiOutlineShieldCheck
 } from 'react-icons/hi';
 
 const Sidebar = () => {
@@ -65,6 +66,13 @@ const Sidebar = () => {
           className={({ isActive }) => isActive ? activeLink : normalLink}
         >
           <HiOutlineShoppingCart className="text-xl" /> Inventory
+        </NavLink>
+
+         <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? activeLink : normalLink}
+        >
+          <HiOutlineHome className="text-xl" /> Back to Home
         </NavLink>
       </nav>
 
