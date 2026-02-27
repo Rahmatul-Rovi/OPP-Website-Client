@@ -27,7 +27,7 @@ const AdminPos = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/products');
+      const res = await axios.get('https://opp-server.vercel.app/products');
       setProducts(res.data);
     } catch (err) {
       console.error("POS Data Load Error", err);
@@ -116,7 +116,7 @@ const finalPayable = useMemo(() => {
       discountPercent: manualDiscount
       };
 
-      const res = await axios.post('http://localhost:5000/api/checkout', payload);
+      const res = await axios.post('https://opp-server.vercel.app/api/checkout', payload);
 
       if (res.status === 200 || res.status === 201) {
         await Swal.fire({

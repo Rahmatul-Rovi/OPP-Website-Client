@@ -17,7 +17,7 @@ const Navbar = () => {
   useEffect(() => {
     if (user?.email) {
       axios
-        .get(`http://localhost:5000/users/admin/${user.email}`)
+        .get(`https://opp-server.vercel.app/users/admin/${user.email}`)
         .then((res) => {
           setIsAdmin(res.data.admin);
         })

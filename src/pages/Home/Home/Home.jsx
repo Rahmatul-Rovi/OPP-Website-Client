@@ -21,7 +21,7 @@ export default function Home() {
 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/products');
+        const res = await axios.get('https://opp-server.vercel.app/products');
         setProducts(res.data);
       } catch (err) {
         console.error("Backend connection fail:", err);

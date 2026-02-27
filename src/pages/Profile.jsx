@@ -10,7 +10,7 @@ const Profile = () => {
   useEffect(() => {
     if (user?.email) {
       axios
-        .get("http://localhost:5000/users")
+        .get("https://opp-server.vercel.app/users")
         .then((res) => {
           const currentUser = res.data.find(
             (u) => u.email === user.email

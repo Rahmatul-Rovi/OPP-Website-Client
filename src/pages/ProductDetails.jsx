@@ -17,7 +17,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/products/${id}`);
+                const res = await axios.get(`https://opp-server.vercel.app/products/${id}`);
                 setProduct(res.data);
                 
                 // Initial states setup

@@ -9,7 +9,7 @@ const MakeAdmin = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/users');
+      const res = await axios.get('https://opp-server.vercel.app/users');
       setUsers(res.data);
     } catch (err) {
       console.error("User load hoy nai");
@@ -40,7 +40,7 @@ const MakeAdmin = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.patch(`http://localhost:5000/users/admin/${user._id}`);
+          const res = await axios.patch(`https://opp-server.vercel.app/users/admin/${user._id}`);
           if (res.data.modifiedCount > 0) {
             const remaining = users.map(u => u._id === user._id ? { ...u, role: 'admin' } : u);
             setUsers(remaining);

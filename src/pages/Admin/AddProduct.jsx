@@ -64,7 +64,7 @@ const AddProduct = () => {
       console.log("Sending Data:", productData);
 
       const response = await axios.post(
-        'http://localhost:5000/products',
+        'https://opp-server.vercel.app/products',
         productData
       );
 

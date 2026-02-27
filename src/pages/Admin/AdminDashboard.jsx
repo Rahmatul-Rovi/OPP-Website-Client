@@ -25,12 +25,12 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/admin-stats")
+      .get("https://opp-server.vercel.app/admin-stats")
       .then((res) => setStats(res.data))
       .catch((err) => console.error(err));
 
     axios
-      .get("http://localhost:5000/all-sales")
+      .get("https://opp-server.vercel.app/all-sales")
       .then((res) => {
         const today = new Date().toLocaleDateString();
         const filtered = res.data.filter(
@@ -286,54 +286,70 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* 🔥 VIEW DETAILS BUTTON */}
-                    <button
-                      onClick={() => {
-                        if (!sale || !sale.cart) {
-                          Swal.fire({
-                            title: "Error!",
-                            text: "Item details not found for this order.",
-                            icon: "error",
-                            confirmButtonColor: "#000000",
-                          });
-                          return;
-                        }
+                  {/* 🔥 VIEW DETAILS BUTTON */}
+<button
+  onClick={() => {
+    if (!sale || !sale.cart) {
+      Swal.fire({
+        title: "Error!",
+        text: "Item details not found for this order.",
+        icon: "error",
+        confirmButtonColor: "#000000",
+      });
+      return;
+    }
 
-                        Swal.fire({
-                          title: `<span class="text-sm font-black uppercase tracking-widest">Order Details - ${sale.invoiceNo}</span>`,
-                          html: `
+    // Calculation: Total price calculation manually from cart if needed
+    const subTotal = sale.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const discountAmount = subTotal - sale.totalAmount;
+
+    Swal.fire({
+      title: `<span class="text-sm font-black uppercase tracking-widest">Order Details - ${sale.invoiceNo}</span>`,
+      html: `
         <div class="text-left mt-4 border-t pt-4">
           <p class="text-[10px] font-black text-slate-400 uppercase">Customer: <span class="text-slate-900">${sale.customerName}</span></p>
+          
           <div class="mt-4 space-y-2">
-            ${sale.cart
-              ?.map(
-                (item) => `
+            ${sale.cart?.map((item) => `
               <div class="flex justify-between text-xs font-bold border-b border-dashed pb-2">
                 <span class="uppercase text-slate-600">${item.title || "Unknown Item"} (x${item.quantity || 1})</span>
                 <span class="text-slate-900">৳${(item.price || 0) * (item.quantity || 1)}</span>
               </div>
-            `,
-              )
-              .join("")}
+            `).join("")}
           </div>
-          <div class="flex justify-between mt-4 pt-2 border-t-2">
-             <span class="text-xs font-black uppercase">Total Amount</span>
-             <span class="text-lg font-black text-indigo-600">৳${sale.totalAmount}</span>
+
+          <div class="mt-6 space-y-1 pt-2 border-t-2 border-slate-100">
+             <div class="flex justify-between text-xs font-bold text-slate-500">
+                <span>SUBTOTAL</span>
+                <span>৳${subTotal}</span>
+             </div>
+             
+             ${discountAmount > 0 ? `
+             <div class="flex justify-between text-xs font-bold text-red-500">
+                <span>DISCOUNT</span>
+                <span>- ৳${discountAmount}</span>
+             </div>
+             ` : ''}
+
+             <div class="flex justify-between mt-2 pt-2 border-t border-slate-200">
+                <span class="text-xs font-black uppercase text-indigo-600">Total Payable</span>
+                <span class="text-lg font-black text-indigo-600">৳${sale.totalAmount}</span>
+             </div>
           </div>
         </div>
       `,
-                          confirmButtonText: "CLOSE",
-                          confirmButtonColor: "#000000",
-                          customClass: {
-                            popup: "rounded-[32px] p-8",
-                            confirmButton:
-                              "rounded-xl px-10 py-3 font-black text-xs",
-                          },
-                        });
-                      }}
-                      className="text-[9px] font-black bg-white border border-slate-200 px-3 py-1.5 rounded-lg uppercase tracking-widest hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all"
-                    >
-                      View Items
-                    </button>
+      confirmButtonText: "CLOSE",
+      confirmButtonColor: "#000000",
+      customClass: {
+        popup: "rounded-[32px] p-8",
+        confirmButton: "rounded-xl px-10 py-3 font-black text-xs",
+      },
+    });
+  }}
+  className="text-[9px] font-black bg-white border border-slate-200 px-3 py-1.5 rounded-lg uppercase tracking-widest hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all"
+>
+  View Items
+</button>
                   </div>
                 </div>
               ))
