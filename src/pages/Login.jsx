@@ -21,7 +21,6 @@ const Login = () => {
         const userInfo = {
             name: user.displayName || "No Name",
             email: user.email,
-            role: "user" // Default role
         };
 
         try {
