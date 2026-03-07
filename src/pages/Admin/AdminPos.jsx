@@ -361,7 +361,14 @@ const finalPayable = useMemo(() => {
   <div id="printable-receipt" ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
     
     <div className="text-center border-b border-dashed border-black pb-2 mb-2">
-      <h1 className="text-xl font-bold uppercase">ONE POINT PLUS</h1>
+ <div className="w-full text-center"> 
+        <h1 className="text-xl font-black uppercase tracking-tighter inline-block text-black">
+          ONE POINT
+          <span className="inline-block align-top text-sm ml-1 mt-[-2px] font-black text-black">
+            +
+          </span>
+        </h1>
+      </div>
       <p className="text-[10px]">City Centre, Ground Floor Aurangzeb Road, Pabna</p>
       <div className="border-b border-black border-dashed my-2"></div>
       <p className="font-bold uppercase">Cash Receipt</p>
@@ -415,7 +422,12 @@ const finalPayable = useMemo(() => {
     {/* Footer */}
     <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
       <p className="font-bold uppercase">Thank You!</p>
-      <p className="text-[10px] mt-2 font-black italic">ONE POINT PLUS</p>
+   <p className="text-[10px] font-black uppercase italic inline-block">
+          ONE POINT 
+          <span className="inline-block align-top text-[8px] ml-0.5 font-black">
+            +
+          </span>
+        </p>
     </div>
   </div>
 </div>
