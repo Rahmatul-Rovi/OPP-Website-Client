@@ -151,7 +151,12 @@ const finalPayable = useMemo(() => {
         <div className="lg:w-2/3 p-6">
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h2 className="text-3xl font-black uppercase tracking-tighter italic text-black">ONE POINT PLUS</h2>
+           <h2 className="text-3xl font-black uppercase tracking-tighter italic text-red-600 flex items-center">
+  ONE POINT 
+  <span className="text-5xl ml-1 mb-3 inline-block not-italic font-black text-red-600">
+    +
+  </span>
+</h2>
               <p className="text-[10px] text-gray-400 uppercase tracking-[4px]">Operator: {user?.name || "Admin"}</p>
             </div>
             <div className="text-right">
