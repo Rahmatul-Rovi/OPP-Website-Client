@@ -51,7 +51,7 @@ const Navbar = () => {
     className="text-2xl lg:text-3xl font-black tracking-tighter text-red-600 uppercase flex items-center"
   >
     One Point
-    <span className="text-red-600 text-6xl lg:text-5xl ml-1 mb-3 inline-block">
+    <span className="text-xl lg:text-2xl ml-1 mb-5 inline-block font-black text-red-600">
       +
     </span>
   </button>

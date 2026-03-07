@@ -18,9 +18,9 @@ const Sidebar = () => {
     <div className="w-72 bg-black h-screen sticky top-0 text-white p-6 border-r border-gray-800 z-50">
       {/* Brand Logo Section */}
       <div className="mb-12 pt-4">
-       <h2 className="text-3xl font-black uppercase tracking-tighter italic leading-none text-red-600 flex items-center">
+     <h2 className="text-3xl font-black uppercase tracking-tighter italic leading-none text-red-600 flex items-baseline">
   ONE POINT 
-  <span className="text-4xl ml-1 mb-2 inline-block not-italic font-black text-red-600">
+  <span className="relative -top-3 text-xl ml-1 not-italic font-black text-red-600">
     +
   </span>
 </h2>

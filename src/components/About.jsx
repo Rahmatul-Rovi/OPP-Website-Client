@@ -7,9 +7,9 @@ const About = () => {
       <div className="bg-[#F9F9F9] py-20 border-b border-gray-100">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-xs font-bold tracking-[6px] uppercase text-gray-400 mb-4">Our Journey</h1>
-         <h2 className="text-4xl font-black uppercase tracking-tighter text-red-600 italic">
+       <h2 className="text-4xl font-black uppercase tracking-tighter text-red-600 italic text-center justify-center flex items-center">
   One Point 
-  <span className="text-5xl ml-1 mb-4 inline-block not-italic font-black text-red-600">
+  <span className="text-2xl lg:text-3xl ml-1 mb-6 inline-block not-italic font-black text-red-600">
     +
   </span>
 </h2>
