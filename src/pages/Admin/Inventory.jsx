@@ -10,6 +10,7 @@ const Inventory = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [discount, setDiscount] = useState(0);
   const [newPrice, setNewPrice] = useState(0);
+  const [tempStock, setTempStock] = useState(0); // 🔥 Notun temp stock state
   const [loading, setLoading] = useState(false);
 
   const fetchProducts = async () => {
@@ -57,15 +58,10 @@ const Inventory = () => {
     }
   };
 
-  const handleUpdateStock = async (id, newStock) => {
+  // 🔥 Stock update logic (Shudhu local state change hobe ekhon)
+  const handleLocalStockUpdate = (newStock) => {
     if (newStock < 0) return;
-    try {
-      await axios.patch(`https://opp-server.vercel.app/products/${id}`, { stock: Number(newStock) });
-      setSelectedProduct(prev => prev ? ({ ...prev, stock: Number(newStock) }) : null);
-      fetchProducts();
-    } catch (error) {
-      console.error("Stock update error:", error);
-    }
+    setTempStock(newStock); 
   };
 
   const handleApplyChanges = async () => {
@@ -73,6 +69,7 @@ const Inventory = () => {
     
     const finalPrice = Number(newPrice);
     const finalDiscount = Number(discount);
+    const finalStock = Number(tempStock); // 🔥 Temp stock database-e jabe
 
     if (isNaN(finalPrice) || finalPrice <= 0) {
       return Swal.fire('Error', 'Please enter a valid price', 'warning');
@@ -81,7 +78,7 @@ const Inventory = () => {
     setLoading(true);
     try {
       await axios.patch(`https://opp-server.vercel.app/products/${selectedProduct._id}`, {
-        stock: Number(selectedProduct.stock),
+        stock: finalStock, // 🔥 Ekshathe update hochche
         price: finalPrice,
         discount: finalDiscount
       });
@@ -93,6 +90,11 @@ const Inventory = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatCurrency = (amount) => {
+    const num = Number(amount);
+    return isNaN(num) ? "0" : num.toLocaleString();
   };
 
   return (
@@ -114,7 +116,7 @@ const Inventory = () => {
           </div>
           <div className="bg-black text-white p-4 min-w-[120px]">
             <p className="text-[9px] font-black uppercase text-gray-500">Low Stock</p>
-            <p className="text-2xl font-black">{products.filter(p => (p.stock || 0) < 5).length}</p>
+            <p className="text-2xl font-black">{products.filter(p => (Number(p.stock) || 0) < 5).length}</p>
           </div>
         </div>
       </div>
@@ -167,7 +169,7 @@ const Inventory = () => {
                     </div>
                     <div>
                       <p className="text-sm font-black uppercase leading-none">{item.title}</p>
-                      <p className="text-[9px] text-gray-400 mt-1">ID: {item._id.slice(-6).toUpperCase()}</p>
+                      <p className="text-[9px] text-gray-400 mt-1">ID: {item._id?.slice(-6).toUpperCase()}</p>
                     </div>
                   </td>
                   <td className="p-5">
@@ -176,16 +178,16 @@ const Inventory = () => {
                   <td className="p-5">
                     {disc > 0 ? (
                       <div className="flex flex-col leading-tight">
-                        <span className="text-[10px] text-gray-400 line-through">৳{mainPrice.toLocaleString()}</span>
-                        <span className="text-sm font-black text-red-600 italic">৳{discountedPrice.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-400 line-through">৳{formatCurrency(mainPrice)}</span>
+                        <span className="text-sm font-black text-red-600 italic">৳{formatCurrency(discountedPrice)}</span>
                       </div>
                     ) : (
-                      <span className="text-sm font-black text-black">৳{mainPrice.toLocaleString()}</span>
+                      <span className="text-sm font-black text-black">৳{formatCurrency(mainPrice)}</span>
                     )}
                   </td>
                   <td className="p-5">
                     <div className="flex items-center gap-2">
-                        <div className={`h-2 w-2 rounded-full ${(item.stock || 0) > 5 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <div className={`h-2 w-2 rounded-full ${(Number(item.stock) || 0) > 5 ? 'bg-green-500' : 'bg-red-500'}`}></div>
                         <span className="text-[11px] font-black uppercase">{item.stock || 0} Units</span>
                     </div>
                   </td>
@@ -195,6 +197,7 @@ const Inventory = () => {
                         setSelectedProduct(item);
                         setNewPrice(item.price || 0);
                         setDiscount(item.discount || 0);
+                        setTempStock(item.stock || 0); // 🔥 Initial stock load
                       }} 
                       className="p-2.5 bg-white border border-black text-black hover:bg-black hover:text-white transition-all"
                     >
@@ -230,7 +233,7 @@ const Inventory = () => {
                 <h3 className="text-2xl font-black uppercase tracking-tight mb-2 leading-none">{selectedProduct.title}</h3>
                 <div className="mt-4">
                     <p className="text-[10px] font-bold text-gray-400 uppercase">Current Market Price</p>
-                    <p className="text-3xl font-black">৳{(Number(newPrice) || 0).toLocaleString()}</p>
+                    <p className="text-3xl font-black">৳{formatCurrency(newPrice)}</p>
                 </div>
               </div>
             </div>
@@ -258,14 +261,15 @@ const Inventory = () => {
             </div>
 
             <div className="mb-10 bg-gray-50 p-6 border border-dashed border-gray-300">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-4">Stock Inventory Adjustment</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-4">Stock Inventory Adjustment (Pending Sync)</label>
               <div className="flex items-center gap-8">
-                <button onClick={() => handleUpdateStock(selectedProduct._id, (selectedProduct.stock || 0) - 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlineMinus /></button>
+                {/* 🔥 Local Temp Stock Update (No API Call here) */}
+                <button onClick={() => handleLocalStockUpdate(Number(tempStock) - 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlineMinus /></button>
                 <div className="flex flex-col items-center">
-                    <span className="text-3xl font-black">{selectedProduct.stock || 0}</span>
-                    <span className="text-[8px] font-black uppercase text-gray-400">In Warehouse</span>
+                    <span className="text-3xl font-black">{tempStock}</span>
+                    <span className="text-[8px] font-black uppercase text-gray-400">Preview Units</span>
                 </div>
-                <button onClick={() => handleUpdateStock(selectedProduct._id, (selectedProduct.stock || 0) + 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlinePlus /></button>
+                <button onClick={() => handleLocalStockUpdate(Number(tempStock) + 1)} className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all"><HiOutlinePlus /></button>
               </div>
             </div>
 
@@ -276,6 +280,7 @@ const Inventory = () => {
             >
               {loading ? 'Processing...' : 'Synchronize Changes'}
             </button>
+            <p className="text-[9px] text-center mt-3 text-gray-400 italic">Note: Changes won't save unless you Synchronize.</p>
           </div>
         </div>
       )}

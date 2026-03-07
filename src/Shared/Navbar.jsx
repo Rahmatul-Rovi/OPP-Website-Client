@@ -45,14 +45,17 @@ const Navbar = () => {
 
       <div className="container mx-auto px-4 lg:px-10 py-3 flex justify-between items-center">
         {/* Left: Brand Logo */}
-        <div className="flex-shrink-0">
-          <button
-            onClick={handleLogoClick}
-            className="text-xl lg:text-2xl font-black tracking-tighter text-black uppercase"
-          >
-            One Point <span className="text-gray-300">Plus</span>
-          </button>
-        </div>
+     <div className="flex-shrink-0 -mt-2"> {/* Puratuku upore uthanor jonno */}
+  <button
+    onClick={handleLogoClick}
+    className="text-2xl lg:text-3xl font-black tracking-tighter text-red-600 uppercase flex items-center"
+  >
+    One Point
+    <span className="text-red-600 text-6xl lg:text-5xl ml-1 mb-3 inline-block">
+      +
+    </span>
+  </button>
+</div>
 
         <div className="hidden lg:block">
           <ul className="flex items-center space-x-8 text-[10px] font-black uppercase tracking-[2px]">
