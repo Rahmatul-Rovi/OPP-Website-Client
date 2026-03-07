@@ -7,9 +7,12 @@ const About = () => {
       <div className="bg-[#F9F9F9] py-20 border-b border-gray-100">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-xs font-bold tracking-[6px] uppercase text-gray-400 mb-4">Our Journey</h1>
-          <h2 className="text-4xl font-black uppercase tracking-tighter text-black italic">
-            One Point <span className="text-blue-600 italic">Plus</span>
-          </h2>
+         <h2 className="text-4xl font-black uppercase tracking-tighter text-red-600 italic">
+  One Point 
+  <span className="text-5xl ml-1 mb-4 inline-block not-italic font-black text-red-600">
+    +
+  </span>
+</h2>
           <div className="h-1 w-16 bg-black mx-auto mt-6"></div>
         </div>
       </div>

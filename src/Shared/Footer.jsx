@@ -9,7 +9,12 @@ const Footer = () => {
         
         {/* Brand Info */}
         <div className="space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-[3px] text-black">One Point Plus</h4>
+         <h4 className="text-sm font-black uppercase tracking-[2px] text-red-600 flex items-center">
+  One Point 
+  <span className="text-lg ml-1 mb-2 inline-block font-black text-red-600">
+    +
+  </span>
+</h4>
           <p className="text-gray-500 text-[13px] leading-relaxed">
             Redefining your everyday style with premium quality and minimalist design. 
             Crafted for those who value excellence.
