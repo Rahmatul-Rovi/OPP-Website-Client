@@ -356,80 +356,172 @@ const finalPayable = useMemo(() => {
 </div>
       </div>
 
-  {/*  THERMAL RECEIPT SECTION */}
+{/* THERMAL RECEIPT SECTION */}
 <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
-  <div id="printable-receipt" ref={componentRef} className="p-4 text-black bg-white w-[80mm] font-mono">
-    
-    <div className="text-center border-b border-dashed border-black pb-2 mb-2">
- <div className="w-full text-center"> 
-        <h1 className="text-xl font-black uppercase tracking-tighter inline-block text-black">
-          ONE POINT
-          <span className="inline-block align-top text-sm ml-1 mt-[-2px] font-black text-black">
-            +
-          </span>
-        </h1>
-      </div>
-      <p className="text-[10px]">City Centre, Ground Floor Aurangzeb Road, Pabna</p>
-      <div className="border-b border-black border-dashed my-2"></div>
-      <p className="font-bold uppercase">Cash Receipt</p>
-    </div>
+<div
+  id="printable-receipt"
+  ref={componentRef}
+  className="bg-white text-black font-mono"
+  style={{ width: "72mm", padding: "6px" }}
+>
 
-    <div className="mb-1 space-y-1 text-[9px] text-left"> 
-      <div className="flex justify-between font-bold text-[9px]"> 
-        <span>Inv: #{invoiceNumber}</span>
-        <span>{new Date().toLocaleDateString()}</span>
-      </div>
-      <div className="border-b border-black border-dotted my-1"></div>
-      <p className="truncate">Customer: {customer.name || "Walk-in"}</p>
-      <p className="truncate">Phone: {customer.phone || "N/A"}</p>
-    </div>
+{/* HEADER */}
+<div className="text-center pb-2 border-b border-dashed border-black ">
 
-    {/* Items List */}
-    <div className="border-t border-b border-black border-dashed py-2 my-2">
-      <div className="flex justify-start font-bold mb-1 text-[10px]">
-        <span className="w-1/2 text-left">Item</span>
-        <span className="w-1/4 text-center">Qty</span>
-        <span className="w-1/4 text-right">Price</span>
-      </div>
-      {cart.map((item, i) => (
-        <div key={i} className="flex justify-start text-[10px] leading-tight mb-1">
-          <span className="w-1/2 text-left uppercase truncate">{item.title}</span>
-          <span className="w-1/4 text-center">{item.quantity}</span>
-          <span className="w-1/4 text-right">৳{item.price * item.quantity}</span>
-        </div>
-      ))}
-    </div>
+<h1 className="text-lg font-extrabold uppercase tracking-tight">
+ONE POINT<span className="text-sm align-top ml-1">+</span>
+</h1>
 
-    <div className="border-t border-black border-dashed pt-1 mt-2">
-      <div className="flex justify-between text-[10px]">
-        <span>Subtotal</span>
-        <span>৳{subTotal}.00</span>
-      </div>
-      
-      {manualDiscount > 0 && (
-        <div className="flex justify-between text-[10px]">
-          <span>Extra Discount ({manualDiscount}%)</span>
-          <span>- ৳{(subTotal * manualDiscount) / 100}</span>
-        </div>
-      )}
+<p className="text-[9px] leading-tight font-bold">
+City Centre, Ground Floor<br/>
+Aurangzeb Road, Pabna
+</p>
 
-      <div className="flex justify-between font-black text-[12px] mt-1 border-t border-black pt-1">
-        <span>NET PAYABLE</span>
-        <span>৳{finalPayable}.00</span>
-      </div>
-    </div>
+<p className="text-[10px] mt-1 font-bold uppercase">
+Cash Receipt
+</p>
 
-    {/* Footer */}
-    <div className="mt-8 text-center pt-4 border-t border-dashed border-black">
-      <p className="font-bold uppercase">Thank You!</p>
-   <p className="text-[10px] font-black uppercase italic inline-block">
-          ONE POINT 
-          <span className="inline-block align-top text-[8px] ml-0.5 font-black">
-            +
-          </span>
-        </p>
-    </div>
-  </div>
+</div>
+
+
+{/* INVOICE INFO */}
+
+<div className="text-[9px] mt-2 space-y-[2px]">
+
+<div className="flex justify-between">
+<span>Invoice</span>
+<span>#{invoiceNumber}</span>
+</div>
+
+<div className="flex justify-between">
+<span>Date</span>
+<span>{new Date().toLocaleDateString()}</span>
+</div>
+
+<div className="flex justify-between">
+<span>Time</span>
+<span>{new Date().toLocaleTimeString()}</span>
+</div>
+
+<div className="border-t border-dotted border-black my-1"></div>
+
+<p>Customer: {customer.name || "Walk-in"}</p>
+<p>Phone: {customer.phone || "N/A"}</p>
+
+</div>
+
+
+
+{/* ITEMS TABLE */}
+
+<div className="mt-2 border-t border-b border-dashed border-black py-2">
+
+<div className="flex text-[10px] font-bold mb-1">
+
+<span style={{ width: "50%" }}>Item</span>
+
+<span style={{ width: "20%", textAlign: "center" }}>
+Qty
+</span>
+
+<span style={{ width: "30%", textAlign: "right" }}>
+Amount
+</span>
+
+</div>
+
+
+{cart.map((item, i) => (
+
+<div
+key={i}
+className="flex text-[10px] leading-tight"
+>
+
+<span
+style={{
+width: "50%",
+overflow: "hidden",
+whiteSpace: "nowrap",
+textOverflow: "ellipsis"
+}}
+>
+{item.title}
+</span>
+
+<span
+style={{
+width: "20%",
+textAlign: "center"
+}}
+>
+{item.quantity}
+</span>
+
+<span
+style={{
+width: "30%",
+textAlign: "right"
+}}
+>
+৳{item.price * item.quantity}
+</span>
+
+</div>
+
+))}
+
+</div>
+
+
+
+{/* TOTALS */}
+
+<div className="text-[10px] mt-2 space-y-[2px]">
+
+<div className="flex justify-between">
+<span>Subtotal</span>
+<span>৳{subTotal}</span>
+</div>
+
+{manualDiscount > 0 && (
+
+<div className="flex justify-between">
+<span>Discount ({manualDiscount}%)</span>
+<span>- ৳{(subTotal * manualDiscount) / 100}</span>
+</div>
+
+)}
+
+<div className="border-t border-dashed border-black my-1"></div>
+
+<div className="flex justify-between text-[12px] font-bold">
+
+<span>NET PAYABLE</span>
+
+<span>৳{finalPayable}</span>
+
+</div>
+
+</div>
+
+
+
+{/* FOOTER */}
+
+<div className="text-center mt-4 border-t border-dashed border-black pt-2">
+
+<p className="text-[10px] font-bold uppercase">
+Thank You For Shopping!
+</p>
+
+<p className="text-[9px] mt-1">
+Please Visit Again
+</p>
+
+</div>
+
+</div>
 </div>
     </div>
   );

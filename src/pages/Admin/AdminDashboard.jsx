@@ -32,10 +32,12 @@ const AdminDashboard = () => {
     axios
       .get("https://opp-server.vercel.app/all-sales")
       .then((res) => {
-        const today = new Date().toLocaleDateString();
-        const filtered = res.data.filter(
-          (s) => new Date(s.date).toLocaleDateString() === today,
-        );
+       const today = new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Dhaka' });
+      
+      const filtered = res.data.filter((s) => {
+        const saleDate = new Date(s.date).toLocaleDateString('en-US', { timeZone: 'Asia/Dhaka' });
+        return saleDate === today;
+      });
         setTodayOrders(filtered);
       })
       .catch((err) => console.error(err));
