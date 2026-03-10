@@ -386,27 +386,27 @@ Cash Receipt
 
 {/* INVOICE INFO */}
 
-<div className="text-[9px] mt-2 space-y-[2px]">
+<div className="text-[10px] mt-2 space-y-[2px]">
 
-<div className="flex justify-between">
+<div className="flex justify-between font-bold">
 <span>Invoice</span>
 <span>#{invoiceNumber}</span>
 </div>
 
-<div className="flex justify-between">
+<div className="flex justify-between font-bold">
 <span>Date</span>
 <span>{new Date().toLocaleDateString()}</span>
 </div>
 
-<div className="flex justify-between">
+<div className="flex justify-between font-bold">
 <span>Time</span>
 <span>{new Date().toLocaleTimeString()}</span>
 </div>
 
 <div className="border-t border-dotted border-black my-1"></div>
 
-<p>Customer: {customer.name || "Walk-in"}</p>
-<p>Phone: {customer.phone || "N/A"}</p>
+<p className='font-bold'>Customer: {customer.name || "Walk-in"}</p>
+<p className='font-bold'>Phone: {customer.phone || "N/A"}</p>
 
 </div>
 
@@ -435,7 +435,7 @@ Amount
 
 <div
 key={i}
-className="flex text-[10px] leading-tight"
+className="flex text-[10px] leading-tight font-bold"
 >
 
 <span
@@ -479,14 +479,14 @@ textAlign: "right"
 
 <div className="text-[10px] mt-2 space-y-[2px]">
 
-<div className="flex justify-between">
+<div className="flex justify-between font-bold">
 <span>Subtotal</span>
 <span>৳{subTotal}</span>
 </div>
 
 {manualDiscount > 0 && (
 
-<div className="flex justify-between">
+<div className="flex justify-between font-bold">
 <span>Discount ({manualDiscount}%)</span>
 <span>- ৳{(subTotal * manualDiscount) / 100}</span>
 </div>
@@ -515,7 +515,7 @@ textAlign: "right"
 Thank You For Shopping!
 </p>
 
-<p className="text-[9px] mt-1">
+<p className="text-[9px] mt-1 font-bold">
 Please Visit Again
 </p>
 
