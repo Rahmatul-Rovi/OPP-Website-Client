@@ -361,7 +361,7 @@ const finalPayable = useMemo(() => {
 <div
   id="printable-receipt"
   ref={componentRef}
-  className="bg-white text-black font-mono"
+  className="bg-white text-black font-sans"
   style={{ width: "58mm", padding: "4px" }}
 >
 
@@ -372,12 +372,12 @@ const finalPayable = useMemo(() => {
 ONE POINT<span className="text-sm align-top ml-1">+</span>
 </h1>
 
-<p className="text-[10px] leading-tight font-extrabold">
+<p className="text-[12px] leading-tight font-extrabold">
 City Centre, Ground Floor<br/>
 Aurangzeb Road, Pabna
 </p>
 
-<p className="text-[10px] mt-1 font-extrabold uppercase">
+<p className="text-[12px] mt-1 font-extrabold uppercase mb-2">
 Cash Receipt
 </p>
 
@@ -386,7 +386,7 @@ Cash Receipt
 
 {/* INVOICE INFO */}
 
-<div className="text-[10px] mt-2 space-y-[2px]">
+<div className="text-[12px] mt-2 space-y-2">
 
 <div className="flex justify-between font-extrabold">
 <span>Invoice</span>
@@ -398,15 +398,15 @@ Cash Receipt
 <span>{new Date().toLocaleDateString()}</span>
 </div>
 
-<div className="flex justify-between font-extrabold">
+<div className="flex justify-between font-extrabold mb-2">
 <span>Time</span>
 <span>{new Date().toLocaleTimeString()}</span>
 </div>
 
 <div className="border-t border-dotted border-black my-1"></div>
 
-<p className='font-extrabold'>Customer: {customer.name || "Walk-in"}</p>
-<p className='font-extrabold'>Phone: {customer.phone || "N/A"}</p>
+<p className='font-extrabold mb-2'>Customer: {customer.name || "Walk-in"}</p>
+<p className='font-extrabold mb-2'>Phone: {customer.phone || "N/A"}</p>
 
 </div>
 
@@ -416,7 +416,7 @@ Cash Receipt
 
 <div className="mt-2 border-t border-b border-dashed border-black py-2">
 
-<div className="flex text-[10px] font-extrabold mb-1">
+<div className="flex text-[12px] font-extrabold mb-1">
 
 <span style={{ width: "50%" }}>Item</span>
 
@@ -435,7 +435,7 @@ Amount
 
 <div
 key={i}
-className="flex text-[10px] leading-tight font-extrabold"
+className="flex text-[12px] leading-tight font-extrabold mb-3"
 >
 
 <span
@@ -477,9 +477,11 @@ textAlign: "right"
 
 {/* TOTALS */}
 
-<div className="text-[10px] mt-2 space-y-[2px]">
+<div className="text-[12px] mt-2 space-y-[2px]">
 
-<div className="flex justify-between font-bold">
+  <div className="border-t border-dashed border-black my-1"></div>
+
+<div className="flex justify-between font-bold text-[12px]">
 <span>Subtotal</span>
 <span>৳{subTotal}</span>
 </div>
@@ -509,13 +511,13 @@ textAlign: "right"
 
 {/* FOOTER */}
 
-<div className="text-center mt-6 border-t border-dashed border-black pt-4">
+<div className="text-center mt-10 border-t border-dashed border-black pt-10">
 
-<p className="text-[11px] font-extrabold uppercase">
+<p className="text-[13px] font-extrabold uppercase mt-4">
 Thank You For Shopping!
 </p>
 
-<p className="text-[10px] mt-2 font-extrabold">
+<p className="text-[12px] mt-6 font-extrabold">
 Please Visit Again
 </p>
 
