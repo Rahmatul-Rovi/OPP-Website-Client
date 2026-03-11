@@ -66,7 +66,7 @@ const AdminPos = () => {
 
   const addToCart = (product) => {
     if (product.stock <= 0) {
-      return Swal.fire("Out of Stock", "Product stock-e nai!", "warning");
+      return Swal.fire("Out of Stock", "Product unavailable on stock!", "warning");
     }
 
     // Discounted price calculate kore cart-e add
