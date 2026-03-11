@@ -32,9 +32,9 @@
   /* 3. Position the receipt at the very top-left of the paper */
  #printable-receipt {
   position: absolute !important;
-  left: 50 !important;       /* 1️⃣ Move left 50% */
+  left: 0 !important;       /* 1️⃣ Move left 50% */
   top: 0 !important;
-  width: 72mm;
+  width: 58mm;
   margin: 0 !important;
   padding: 2mm !important;
   background: white;
@@ -53,7 +53,7 @@
 
   /* 5. Set the paper size for thermal printers */
   @page {
-    size: 76mm auto;
+    size: 60mm auto;
     margin: 0;
   }
 }
